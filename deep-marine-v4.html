@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="tr" data-lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Marine — Denizcilik Ekipman & Yedek Parça</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════
+   TEMA SİSTEMİ — koyu: derin su / açık: yüzey
+   ════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-0:      #060E1A;   /* en derin — neredeyse siyah */
+  --bg-1:      #0A1628;
+  --bg-2:      #0D1E35;
+  --bg-3:      #112240;
+  --accent:    #00C2D4;
+  --accent-2:  #0B8DA6;
+  --accent-dim:#00C2D422;
+  --text:      #E8F0F7;
+  --text-2:    #8FAFC8;
+  --text-3:    #4A6580;
+  --border:    rgba(0,194,212,0.10);
+  --border-2:  rgba(255,255,255,0.06);
+  --card-bg:   rgba(13,30,53,0.85);
+  --hero-grad: radial-gradient(ellipse 70% 60% at 55% 45%, rgba(11,141,166,0.28) 0%, transparent 70%),
+               radial-gradient(ellipse 40% 50% at 5% 85%, rgba(0,194,212,0.07) 0%, transparent 60%),
+               linear-gradient(180deg, #060E1A 0%, #0A1628 100%);
+  --grid-line: rgba(0,194,212,0.035);
+  --noise-op:  0.55;
+  --shadow:    0 24px 60px rgba(0,0,0,0.55);
+  --navbar-bg: rgba(6,14,26,0.88);
+}
+
+[data-theme="light"] {
+  --bg-0:      #E8F4F8;   /* yüzey — açık su tonu */
+  --bg-1:      #F0F8FC;
+  --bg-2:      #FFFFFF;
+  --bg-3:      #DDF0F7;
+  --accent:    #0088A3;
+  --accent-2:  #006880;
+  --accent-dim:#0088A318;
+  --text:      #0A2030;
+  --text-2:    #2A5870;
+  --text-3:    #6A9AAE;
+  --border:    rgba(0,136,163,0.15);
+  --border-2:  rgba(0,0,0,0.07);
+  --card-bg:   rgba(255,255,255,0.92);
+  --hero-grad: radial-gradient(ellipse 80% 60% at 55% 40%, rgba(150,220,240,0.55) 0%, transparent 65%),
+               radial-gradient(ellipse 50% 50% at 5% 85%, rgba(0,136,163,0.12) 0%, transparent 60%),
+               linear-gradient(180deg, #C8E8F4 0%, #E8F4F8 100%);
+  --grid-line: rgba(0,136,163,0.06);
+  --noise-op:  0.2;
+  --shadow:    0 12px 40px rgba(0,100,130,0.12);
+  --navbar-bg: rgba(232,244,248,0.9);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-0);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:var(--noise-op);
+  transition:opacity 0.5s;
+}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg-1)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+.container{max-width:1300px;margin:0 auto;padding:0 44px}
+.tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+a{color:inherit;text-decoration:none}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  position:relative;
+  width:52px; height:28px;
+  background:var(--bg-3);
+  border:1px solid var(--border);
+  border-radius:14px;
+  cursor:pointer;
+  transition:all .4s;
+  flex-shrink:0;
+}
+.theme-toggle-thumb {
+  position:absolute;
+  top:3px; left:3px;
+  width:20px; height:20px;
+  border-radius:50%;
+  background:var(--accent);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;
+}
+[data-theme="light"] .theme-toggle-thumb{transform:translateX(24px)}
+.theme-icon-dark,.theme-icon-light{position:absolute;transition:opacity .3s}
+.theme-icon-dark{opacity:1}
+.theme-icon-light{opacity:0}
+[data-theme="light"] .theme-icon-dark{opacity:0}
+[data-theme="light"] .theme-icon-light{opacity:1}
+.theme-depth-indicator {
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  color:var(--text-3);
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:90;
+  height:68px;padding:0 44px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .4s, backdrop-filter .4s, border-color .4s;
+}
+nav.scrolled {
+  background:var(--navbar-bg);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:.07em;
+  color:var(--text);
+  display:flex;align-items:center;gap:9px;
+}
+.brand-services {
+  color: var(--accent);
+  transition: color .4s;
+}
+[data-theme="dark"] .brand-text { color: #E8F0F7; }
+[data-theme="light"] .brand-text { color: var(--accent); }
+.nav-pulse{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2.2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+.nav-links{display:flex;align-items:center;gap:34px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:var(--text-2);letter-spacing:.03em;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--accent);transition:width .3s cubic-bezier(.19,1,.22,1)}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;align-items:center;background:var(--bg-3);border:1px solid var(--border-2);border-radius:20px;padding:3px;gap:2px}
+.lang-btn{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:5px 12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--text-2);transition:all .2s}
+.lang-btn.active{background:var(--accent);color:var(--bg-0)}
+.btn-cta{background:var(--accent);color:var(--bg-0);font-weight:700;font-size:13px;padding:9px 22px;border-radius:6px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.03em}
+.btn-cta:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 35%,transparent)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:68px}
+.hero-bg{position:absolute;inset:0;background:var(--hero-grad);transition:background .6s}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at center,black 0%,transparent 70%);transition:opacity .5s}
+.hero-content{position:relative;z-index:1;width:100%;max-width:1300px;margin:0 auto;padding:80px 44px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.hero-line{width:36px;height:1px;background:var(--accent)}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,7vw,92px);line-height:.92;letter-spacing:.02em;margin-bottom:24px;color:var(--text);transition:color .4s}
+.hero-h1 span{color:var(--accent)}
+.hero-desc{font-size:16px;color:var(--text-2);max-width:450px;margin-bottom:40px;line-height:1.75;transition:color .4s}
+.hero-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:var(--bg-0);font-weight:700;font-size:14px;padding:13px 30px;border-radius:7px;border:none;cursor:pointer;transition:all .3s cubic-bezier(.19,1,.22,1);letter-spacing:.04em;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{filter:brightness(1.12);transform:translateY(-2px);box-shadow:0 12px 32px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn-outline{background:transparent;color:var(--text);font-weight:500;font-size:14px;padding:13px 26px;border-radius:7px;border:1px solid var(--border-2);cursor:pointer;transition:all .3s;letter-spacing:.04em}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.hero-stats{display:flex;gap:40px;margin-top:52px;padding-top:36px;border-top:1px solid var(--border-2)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--text);line-height:1}
+.stat-label{font-size:12px;color:var(--text-3);margin-top:3px}
+
+/* Hero mockup */
+.hero-visual{display:flex;justify-content:center;align-items:center}
+.hero-mockup{width:100%;max-width:500px;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:22px;backdrop-filter:blur(20px);box-shadow:var(--shadow);position:relative;transition:background .5s,border-color .5s,box-shadow .5s}
+.hero-mockup::before{content:'';position:absolute;top:-1px;left:40px;right:40px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.mockup-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border-2)}
+.mockup-dots{display:flex;gap:5px}
+.mockup-dot{width:8px;height:8px;border-radius:50%}
+.mockup-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
+.mproduct{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--accent) 4%,transparent);border:1px solid var(--border-2);border-radius:9px;padding:11px 13px;margin-bottom:8px;transition:border-color .2s}
+.mproduct:hover{border-color:var(--border)}
+.mproduct-icon{width:34px;height:34px;background:var(--accent-dim);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);flex-shrink:0}
+.mproduct-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.mproduct-code{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-3)}
+.mproduct-price{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);margin-left:auto;flex-shrink:0}
+.mdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mdot-ok{background:#28CA41}.mdot-low{background:#FFBD2E}.mdot-out{background:#FF5F57}
+
+/* ── MARQUEE ── */
+.marquee-wrap{background:var(--bg-3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 0;overflow:hidden;transition:background .5s}
+.marquee-track{display:flex;gap:56px;animation:marquee 26s linear infinite;width:max-content}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-item{display:flex;align-items:center;gap:10px;white-space:nowrap;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-3);letter-spacing:.08em}
+.mq-item svg{color:var(--accent)}
+.mq-sep{color:var(--border)}
+
+/* ── SECTION ── */
+section{position:relative;z-index:1}
+.section-hdr{text-align:center;margin-bottom:64px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5vw,64px);line-height:.95;letter-spacing:.02em;margin:14px 0 18px;color:var(--text)}
+.section-title span{color:var(--accent)}
+.section-desc{font-size:15px;color:var(--text-2);max-width:500px;margin:0 auto;line-height:1.75}
+
+/* ── CATEGORIES ── */
+.cat-section{padding:120px 0}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cat-card{background:var(--card-bg);border:1px solid var(--border-2);border-radius:14px;padding:32px 28px;cursor:pointer;transition:all .4s cubic-bezier(.19,1,.22,1);position:relative;overflow:hidden}
+.cat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,transparent) 0%,transparent 60%);opacity:0;transition:opacity .4s}
+.cat-card:hover{border-color:var(--border);transform:translateY(-4px);box-shadow:var(--shadow)}
+.cat-card:hover::before{opacity:1}
+.cat-icon-wrap{width:48px;height:48px;background:var(--accent-dim);border:1px solid var(--border);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;transition:all .4s}
+.cat-card:hover .cat-icon-wrap{background:var(--accent)}
+.cat-card:hover .cat-icon-wrap svg{color:var(--bg-0)}
+.cat-icon-wrap svg{color:var(--accent);transition:color .4s}
+.cat-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;margin-bottom:6px;color:var(--text)}
+.cat-sub{font-size:13px;color:var(--text-3);margin-bottom:18px;line-height:1.5}
+.cat-arrow{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--accent);font-weight:500;opacity:0;transform:translateX(-8px);transition:all .3s}
+.cat-card:hover .cat-arrow{opacity:1;transform:translateX(0)}
+
+/* ── PRODUCTS ── */
+.prod-section{padding:0 0 120px}
+.prod-filter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:52px}
+.fpill{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 20px;border-radius:30px;border:1px solid var(--border-2);background:transparent;color:var(--text-3);cursor:pointer;transition:all .25s}
+.fpill:hover{border-color:var(--border);color:var(--text)}
+.fpill.active{background:var(--accent);color:var(--bg-0);border-color:var(--accent);font-weight:600}
+.prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.prod-card{background:var(--card-bg);border:1px solid var(--border-2);border-radius:14px;overflow:hidden;transition:all .4s cubic-bezier(.19,1,.22,1);cursor:pointer;position:relative}
+.prod-card:hover{border-color:var(--border);transform:translateY(-4px);box-shadow:var(--shadow)}
+.prod-img{aspect-ratio:4/3;background:var(--bg-3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.prod-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.19,1,.22,1)}
+.prod-card:hover .prod-img img{transform:scale(1.05)}
+.prod-img-ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-3)}
+.prod-img-ph svg{width:38px;height:38px;opacity:.5}
+.prod-img-ph span{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;opacity:.6}
+.prod-badge{position:absolute;top:11px;left:11px;font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:20px;letter-spacing:.07em}
+.b-ok{background:rgba(40,202,65,.14);color:#28CA41;border:1px solid rgba(40,202,65,.22)}
+.b-low{background:rgba(255,189,46,.14);color:#FFBD2E;border:1px solid rgba(255,189,46,.22)}
+.b-out{background:rgba(224,82,82,.14);color:#FF5F57;border:1px solid rgba(224,82,82,.22)}
+.prod-body{padding:18px 20px 20px}
+.prod-cat{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.12em;margin-bottom:6px}
+.prod-name{font-size:14px;font-weight:600;margin-bottom:3px;line-height:1.3;color:var(--text)}
+.prod-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-3);margin-bottom:14px}
+.prod-footer{display:flex;align-items:center;justify-content:space-between}
+.prod-price{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.02em;color:var(--text)}
+.prod-price-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.btn-quote{background:var(--accent-dim);border:1px solid var(--border);color:var(--accent);font-size:12px;font-weight:600;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .25s;letter-spacing:.04em}
+.btn-quote:hover{background:var(--accent);color:var(--bg-0)}
+
+/* ── WHY ── */
+.why-section{padding:120px 0;background:var(--bg-3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);transition:background .5s}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.why-features{display:flex;flex-direction:column;gap:30px;margin-top:44px}
+.why-feat{display:flex;gap:18px}
+.why-num{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:color-mix(in srgb,var(--accent) 18%,transparent);flex-shrink:0;width:56px;text-align:right}
+.why-title{font-size:15px;font-weight:600;margin-bottom:5px;color:var(--text)}
+.why-desc{font-size:13px;color:var(--text-2);line-height:1.65}
+.why-cards{position:relative;height:440px}
+.why-wcard{position:absolute;background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:26px;transition:background .5s}
+.why-wcard:nth-child(1){top:0;left:0;right:44px}
+.why-wcard:nth-child(2){top:148px;left:44px;right:0;z-index:1}
+.why-wcard:nth-child(3){top:296px;left:0;right:44px}
+.wcard-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.12em;margin-bottom:10px}
+.wcard-title{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.wcard-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--accent)}
+
+/* ── CONTACT ── */
+.contact-section{padding:120px 0}
+.contact-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:80px;align-items:start}
+.contact-info-items{margin-top:44px;display:flex;flex-direction:column;gap:26px}
+.ci-item{display:flex;gap:14px;align-items:flex-start}
+.ci-icon{width:42px;height:42px;background:var(--accent-dim);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+.ci-label{font-size:11px;color:var(--text-3);margin-bottom:3px;font-family:'DM Mono',monospace;letter-spacing:.08em}
+.ci-val{font-size:14px;font-weight:500;color:var(--text)}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:8px;margin-top:32px;transition:all .3s;border:none;cursor:pointer}
+.wa-btn:hover{background:#1fba5a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.3)}
+
+.quote-form{background:var(--card-bg);border:1px solid var(--border);border-radius:18px;padding:38px;position:relative;overflow:hidden;transition:background .5s,border-color .5s}
+.quote-form::before{content:'';position:absolute;top:-1px;left:56px;right:56px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.03em;margin-bottom:6px;color:var(--text)}
+.form-sub{font-size:13px;color:var(--text-3);margin-bottom:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.07em;margin-bottom:7px;text-transform:uppercase;font-family:'DM Mono',monospace}
+.form-input,.form-select,.form-textarea{width:100%;background:color-mix(in srgb,var(--bg-0) 60%,transparent);border:1px solid var(--border-2);border-radius:8px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);transition:all .25s;outline:none;appearance:none}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-3)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 4%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)}
+.form-select{cursor:pointer}
+.form-select option{background:var(--bg-2);color:var(--text)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-submit{width:100%;background:var(--accent);color:var(--bg-0);font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;padding:15px;border-radius:8px;border:none;cursor:pointer;transition:all .3s cubic-bezier(.19,1,.22,1);letter-spacing:.04em;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.form-submit:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 12px 32px color-mix(in srgb,var(--accent) 30%,transparent)}
+.form-success{display:none;text-align:center;padding:40px 20px}
+.fs-icon{font-size:52px;margin-bottom:14px}
+.fs-title{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);margin-bottom:8px}
+.fs-desc{color:var(--text-3);font-size:14px}
+
+/* ── FOOTER ── */
+footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 28px;transition:background .5s}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;margin-bottom:44px}
+.footer-brand{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.footer-desc{font-size:13px;color:var(--text-3);line-height:1.7;max-width:260px}
+.fc-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:18px;font-family:'DM Mono',monospace}
+.fc-links{display:flex;flex-direction:column;gap:11px}
+.fc-links a{font-size:14px;color:var(--text-2);transition:color .2s}
+.fc-links a:hover{color:var(--accent)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid var(--border-2)}
+.footer-copy{font-size:12px;color:var(--text-3)}
+.footer-badges{display:flex;gap:10px}
+.fbadge{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-3);border:1px solid var(--border-2);padding:4px 10px;border-radius:4px;letter-spacing:.08em}
+
+/* ── PRODUCT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;padding:40px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg-2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:700px;max-height:88vh;overflow-y:auto;transform:translateY(20px) scale(.98);transition:transform .4s cubic-bezier(.19,1,.22,1);box-shadow:var(--shadow)}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+.modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:26px 30px 22px;border-bottom:1px solid var(--border-2)}
+.modal-close{width:34px;height:34px;background:var(--bg-3);border:none;border-radius:7px;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:28px 30px}
+.modal-img{aspect-ratio:16/9;background:var(--bg-3);border-radius:11px;margin-bottom:24px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+.modal-img img{width:100%;height:100%;object-fit:cover}
+.modal-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.mm-item{background:var(--bg-3);border:1px solid var(--border-2);border-radius:9px;padding:13px 14px}
+.mm-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:.1em;margin-bottom:5px}
+.mm-val{font-size:14px;font-weight:600;color:var(--text)}
+.modal-desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px}
+.modal-actions{display:flex;gap:10px}
+.modal-actions .btn-primary{flex:1;justify-content:center}
+
+/* ── ADMIN PANEL ── */
+#adminPanel{display:none;position:fixed;inset:0;z-index:300;background:var(--bg-0);overflow-y:auto}
+.admin-nav{background:var(--bg-2);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.admin-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--text);display:flex;align-items:center;gap:8px}
+.admin-badge{background:var(--accent);color:var(--bg-0);font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
+.admin-body{max-width:1100px;margin:0 auto;padding:32px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.admin-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px 24px}
+.admin-card-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-3);letter-spacing:.1em;margin-bottom:6px}
+.admin-card-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text)}
+.admin-section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);margin-bottom:16px}
+.admin-prod-table{width:100%;border-collapse:collapse;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-prod-table th{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--text-3);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border-2);background:var(--bg-3)}
+.admin-prod-table td{padding:12px 16px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border-2)}
+.admin-prod-table tr:last-child td{border-bottom:none}
+.admin-prod-table tr:hover td{background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.admin-thumb{width:44px;height:44px;border-radius:7px;object-fit:cover;background:var(--bg-3);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.admin-thumb img{width:100%;height:100%;object-fit:cover}
+.admin-thumb-ph{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:7px;background:var(--bg-3);border:1px solid var(--border-2);color:var(--text-3);font-size:18px}
+.btn-admin{font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:none;cursor:pointer;transition:all .2s;letter-spacing:.03em}
+.btn-edit{background:var(--accent-dim);color:var(--accent);border:1px solid var(--border)}
+.btn-edit:hover{background:var(--accent);color:var(--bg-0)}
+.btn-del{background:rgba(224,82,82,.12);color:#E05252;border:1px solid rgba(224,82,82,.2)}
+.btn-del:hover{background:#E05252;color:#fff}
+.btn-green{background:rgba(40,202,65,.12);color:#28CA41;border:1px solid rgba(40,202,65,.2)}
+.btn-green:hover{background:#28CA41;color:#fff}
+
+/* Admin add/edit form */
+.admin-form-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);z-index:400;display:flex;align-items:center;justify-content:center;padding:32px;opacity:0;pointer-events:none;transition:opacity .3s}
+.admin-form-overlay.open{opacity:1;pointer-events:all}
+.admin-form-box{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.admin-form-hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--border-2)}
+.admin-form-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text)}
+.admin-form-body{padding:26px}
+
+/* Image upload */
+.img-upload-zone{border:2px dashed var(--border);border-radius:11px;padding:28px;text-align:center;cursor:pointer;transition:all .3s;position:relative;background:var(--bg-3);margin-bottom:14px}
+.img-upload-zone:hover,.img-upload-zone.drag-over{border-color:var(--accent);background:var(--accent-dim)}
+.img-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-icon{color:var(--accent);margin-bottom:10px}
+.upload-text{font-size:13px;color:var(--text-2);margin-bottom:4px}
+.upload-hint{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-3);letter-spacing:.06em}
+.img-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.img-preview-item{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border-2)}
+.img-preview-item img{width:100%;height:100%;object-fit:cover}
+.img-preview-del{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(224,82,82,.85);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;line-height:1}
+
+/* Login overlay */
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(16px);z-index:500;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:360px;box-shadow:var(--shadow)}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:var(--text);margin-bottom:6px;text-align:center}
+.login-sub{font-size:13px;color:var(--text-3);text-align:center;margin-bottom:28px}
+.login-error{background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.25);color:#E05252;font-size:13px;padding:10px 14px;border-radius:7px;margin-bottom:14px;display:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg-2);border:1px solid var(--border);color:var(--text);font-size:14px;padding:13px 26px;border-radius:30px;z-index:999;opacity:0;transition:all .4s cubic-bezier(.19,1,.22,1);pointer-events:none;backdrop-filter:blur(10px);box-shadow:var(--shadow);white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FADE ANIM ── */
+.fade-in{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.19,1,.22,1),transform .7s cubic-bezier(.19,1,.22,1)}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.fade-in:nth-child(2){transition-delay:.1s}
+.fade-in:nth-child(3){transition-delay:.2s}
+.fade-in:nth-child(4){transition-delay:.3s}
+.fade-in:nth-child(5){transition-delay:.4s}
+.fade-in:nth-child(6){transition-delay:.5s}
+
+/* ── RESPONSIVE ── */
+.admin-tab-btn.active{color:var(--text)!important;border-bottom-color:var(--accent)!important}
+.admin-tab-btn:hover{color:var(--text)!important}
+@media(max-width:960px){
+  .hero-content{grid-template-columns:1fr;gap:32px}
+  .hero-visual{display:none}
+  .cat-grid{grid-template-columns:1fr 1fr}
+  .prod-grid{grid-template-columns:1fr 1fr}
+  .why-grid{grid-template-columns:1fr}
+  .why-cards{display:none}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .admin-grid{grid-template-columns:1fr 1fr}
+  nav{padding:0 20px}
+  .container{padding:0 20px}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .cat-grid,.prod-grid{grid-template-columns:1fr}
+  .form-row,.admin-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .hero-stats{flex-wrap:wrap;gap:20px}
+  .modal-meta{grid-template-columns:1fr 1fr}
+  .img-preview-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <div class="nav-brand"><div class="nav-pulse"></div><span class="brand-text">DEEP MARINE <span class="brand-services">SERVICES</span></span></div>
+  <ul class="nav-links">
+    <li><a href="#categories" data-tr="Kategoriler" data-en="Categories">Kategoriler</a></li>
+    <li><a href="#products" data-tr="Ürünler" data-en="Products">Ürünler</a></li>
+    <li><a href="#why" data-tr="Neden Biz?" data-en="Why Us?">Neden Biz?</a></li>
+    <li><a href="#contact" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+  </ul>
+  <div class="nav-right">
+    <!-- Tema toggle -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="theme-depth-indicator" id="depthLabel">● 3000m</span>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Tema değiştir">
+        <div class="theme-toggle-thumb">
+          <span class="theme-icon-dark">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M3 12 Q6 6 12 8 Q8 2 16 2 Q22 8 18 14 Q22 18 18 22 Q12 20 8 22 Q2 18 6 14 Q2 10 3 12Z"/>
+            </svg>
+          </span>
+          <span class="theme-icon-light">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+              <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+              <line x1="2" y1="12" x2="5" y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+              <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('tr')">TR</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="btn-cta" onclick="dmScrollTo('contact')" data-tr="Teklif Al" data-en="Get Quote">Teklif Al</button>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-eyebrow">
+        <div class="hero-line"></div>
+        <span class="tag" data-tr="Tuzla · İstanbul — Türkiye" data-en="Tuzla · Istanbul — Turkey">Tuzla · İstanbul — Türkiye</span>
+      </div>
+      <h1 class="hero-h1" id="heroH1">DENİZCİLİK <span>EKİPMAN</span><br>& YEDEK PARÇA</h1>
+      <p class="hero-desc" data-tr="Elektrik, otomasyon, solar, balast ve ısıtma sistemleri için orijinal ekipman ve yedek parça. Hızlı tedarik, rekabetçi fiyat." data-en="Original equipment and spare parts for electrical, automation, solar, ballast and heating systems. Fast supply, competitive pricing.">
+        Elektrik, otomasyon, solar, balast ve ısıtma sistemleri için orijinal ekipman ve yedek parça. Hızlı tedarik, rekabetçi fiyat.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="dmScrollTo('products')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <span data-tr="Ürün Kataloğu" data-en="Product Catalog">Ürün Kataloğu</span>
+        </button>
+        <button class="btn-outline" onclick="dmScrollTo('contact')" data-tr="Teklif İste" data-en="Request Quote">Teklif İste</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num" id="heroStatCount">0</div><div class="stat-label" data-tr="Stok kalemi" data-en="Stock items">Stok kalemi</div></div>
+        <div><div class="stat-num">48h</div><div class="stat-label" data-tr="Ortalama teslimat" data-en="Avg. delivery">Ortalama teslimat</div></div>
+        <div><div class="stat-num">7+</div><div class="stat-label" data-tr="Yıllık deneyim" data-en="Years exp.">Yıllık deneyim</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-mockup">
+        <div class="mockup-hdr">
+          <div class="mockup-dots"><div class="mockup-dot" style="background:#FF5F57"></div><div class="mockup-dot" style="background:#FFBD2E"></div><div class="mockup-dot" style="background:#28CA41"></div></div>
+          <div class="mockup-badge" data-tr="CANLI STOK" data-en="LIVE STOCK">CANLI STOK</div>
+        </div>
+        <div id="heroMockupList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Elektrik Sistemleri</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33"/></svg>Otomasyon & Kontrol</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>Solar Enerji</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6"/><path d="M5 8h14l-1 13H6L5 8z"/></svg>Balast Sistemleri</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>Isıtma & HVAC</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23"/></svg>Sarf Malzemeleri</span><span class="mq-sep">·</span>
+    <!-- duplicate -->
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Elektrik Sistemleri</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Otomasyon & Kontrol</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>Solar Enerji</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6"/><path d="M5 8h14l-1 13H6L5 8z"/></svg>Balast Sistemleri</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>Isıtma & HVAC</span><span class="mq-sep">·</span>
+    <span class="mq-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67"/></svg>Sarf Malzemeleri</span>
+  </div>
+</div>
+
+<!-- ══ CATEGORIES ══ -->
+<section class="cat-section" id="categories">
+  <div class="container">
+    <div class="section-hdr fade-in">
+      <span class="tag" data-tr="Ürün Kategorileri" data-en="Product Categories">Ürün Kategorileri</span>
+      <h2 class="section-title" data-tr="NE <span>ARIYORSUNUZ?</span>" data-en="WHAT ARE YOU <span>LOOKING FOR?</span>">NE <span>ARIYORSUNUZ?</span></h2>
+      <p class="section-desc" data-tr="Her türlü denizcilik ekipmanı için geniş stok. Orijinal parça, hızlı teslimat." data-en="Extensive stock for all maritime equipment. Original parts, fast delivery.">Her türlü denizcilik ekipmanı için geniş stok. Orijinal parça, hızlı teslimat.</p>
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</section>
+
+<!-- ══ PRODUCTS ══ -->
+<section class="prod-section" id="products">
+  <div class="container">
+    <div class="section-hdr fade-in">
+      <span class="tag" data-tr="Stok & Katalog" data-en="Stock & Catalog">Stok & Katalog</span>
+      <h2 class="section-title" data-tr="ÜRÜN <span>GALERİSİ</span>" data-en="PRODUCT <span>GALLERY</span>">ÜRÜN <span>GALERİSİ</span></h2>
+    </div>
+    <div class="prod-filter" id="prodFilter">
+      <button class="fpill active" onclick="filterProds('all',this)" data-tr="Tümü" data-en="All">Tümü</button>
+      <button class="fpill" onclick="filterProds('Elektrik',this)" data-tr="Elektrik" data-en="Electrical">Elektrik</button>
+      <button class="fpill" onclick="filterProds('Otomasyon',this)" data-tr="Otomasyon" data-en="Automation">Otomasyon</button>
+      <button class="fpill" onclick="filterProds('Solar',this)" data-tr="Solar" data-en="Solar">Solar</button>
+      <button class="fpill" onclick="filterProds('Balast',this)" data-tr="Balast" data-en="Ballast">Balast</button>
+      <button class="fpill" onclick="filterProds('Isıtma',this)" data-tr="Isıtma" data-en="Heating">Isıtma</button>
+      <button class="fpill" onclick="filterProds('Sarf',this)" data-tr="Sarf" data-en="Consumables">Sarf</button>
+    </div>
+    <div class="prod-grid" id="prodGrid"></div>
+    <div style="text-align:center;margin-top:48px">
+      <button class="btn-outline" onclick="dmScrollTo('contact')" data-tr="Katalogda Olmayan Ürünü Sorun →" data-en="Ask About Unlisted Products →">Katalogda Olmayan Ürünü Sorun →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHY ══ -->
+<section class="why-section" id="why">
+  <div class="container">
+    <div class="why-grid">
+      <div>
+        <span class="tag" data-tr="Neden Deep Marine?" data-en="Why Deep Marine?">Neden Deep Marine?</span>
+        <h2 class="section-title" id="whyTitle" style="text-align:left;margin:14px 0 0">SEKTÖRÜN <span>GÜVENİLİR</span> ORTAĞI</h2>
+        <div class="why-features">
+          <div class="why-feat fade-in"><div class="why-num">01</div><div><div class="why-title" data-tr="Orijinal & Sertifikalı Ürün" data-en="Original & Certified Products">Orijinal & Sertifikalı Ürün</div><div class="why-desc" data-tr="Tüm ürünler orijinal tedarikçiden, IMO ve SOLAS sertifikalarıyla temin edilmektedir." data-en="All products sourced directly from original manufacturers with IMO and SOLAS certifications.">Tüm ürünler orijinal tedarikçiden, IMO ve SOLAS sertifikalarıyla temin edilmektedir.</div></div></div>
+          <div class="why-feat fade-in"><div class="why-num">02</div><div><div class="why-title" data-tr="48 Saat İçinde Teslimat" data-en="Delivery Within 48 Hours">48 Saat İçinde Teslimat</div><div class="why-desc" data-tr="Stokta olan ürünler için Türkiye geneli 48 saat. Liman teslimatı için özel lojistik." data-en="48-hour delivery nationwide for in-stock items. Special logistics for port delivery.">Stokta olan ürünler için Türkiye geneli 48 saat. Liman teslimatı için özel lojistik.</div></div></div>
+          <div class="why-feat fade-in"><div class="why-num">03</div><div><div class="why-title" data-tr="B2B & B2C Fiyatlandırma" data-en="B2B & B2C Pricing">B2B & B2C Fiyatlandırma</div><div class="why-desc" data-tr="Tersaneler için özel cari fiyatlar. Toplu alımlarda ek indirim." data-en="Special pricing for shipyards. Additional discounts for bulk orders.">Tersaneler için özel cari fiyatlar. Toplu alımlarda ek indirim.</div></div></div>
+          <div class="why-feat fade-in"><div class="why-num">04</div><div><div class="why-title" data-tr="7/24 Teknik Destek" data-en="24/7 Technical Support">7/24 Teknik Destek</div><div class="why-desc" data-tr="Uzman kadromuz doğru parçayı bulmanızda yardımcı olur. WhatsApp ile anlık destek." data-en="Our expert team helps you find the right part. Instant support via WhatsApp.">Uzman kadromuz doğru parçayı bulmanızda yardımcı olur. WhatsApp ile anlık destek.</div></div></div>
+        </div>
+      </div>
+      <div class="why-cards">
+        <div class="why-wcard"><div class="wcard-label" data-tr="TOPLAM STOK DEĞERİ" data-en="TOTAL STOCK VALUE">TOPLAM STOK DEĞERİ</div><div class="wcard-title" data-tr="Tuzla Deposu" data-en="Tuzla Warehouse">Tuzla Deposu</div><div class="wcard-val">$2.4M+</div></div>
+        <div class="why-wcard"><div class="wcard-label" data-tr="AKTİF TEDARİKÇİ" data-en="ACTIVE SUPPLIERS">AKTİF TEDARİKÇİ</div><div class="wcard-title" data-tr="Küresel Ağ" data-en="Global Network">Küresel Ağ</div><div class="wcard-val" data-tr="28 Ülke" data-en="28 Countries">28 Ülke</div></div>
+        <div class="why-wcard"><div class="wcard-label" data-tr="MÜŞTERİ MEMNUNİYETİ" data-en="CUSTOMER SATISFACTION">MÜŞTERİ MEMNUNİYETİ</div><div class="wcard-title" data-tr="Teslimat Başarısı" data-en="Delivery Success">Teslimat Başarısı</div><div class="wcard-val">%98.4</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div>
+        <span class="tag" data-tr="İletişim & Teklif" data-en="Contact & Quote">İletişim & Teklif</span>
+        <h2 class="section-title" id="contactTitle" style="text-align:left;margin:14px 0 18px">HIZLI <span>TEKLİF</span> ALIN</h2>
+        <p style="color:var(--text-2);font-size:15px;line-height:1.75" data-tr="Stok sorusu, teknik bilgi veya özel sipariş için bize ulaşın. Ekibimiz 24 saat içinde yanıt verir." data-en="Contact us for stock inquiries, technical info or special orders. Our team responds within 24 hours.">Stok sorusu, teknik bilgi veya özel sipariş için bize ulaşın. Ekibimiz 24 saat içinde yanıt verir.</p>
+        <div class="contact-info-items">
+          <div class="ci-item"><div class="ci-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="ci-label" data-tr="ADRES" data-en="ADDRESS">ADRES</div><div class="ci-val">Tuzla, İstanbul, Türkiye</div></div></div>
+          <div class="ci-item"><div class="ci-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><div class="ci-label">E-POSTA</div><div class="ci-val">info@deepmarine.com.tr</div></div></div>
+          <div class="ci-item"><div class="ci-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.06-1.06a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div><div class="ci-label" data-tr="TELEFON" data-en="PHONE">TELEFON</div><div class="ci-val">+90 216 XXX XX XX</div></div></div>
+        </div>
+        <button class="wa-btn" onclick="window.open('https://wa.me/90216XXXXXXX?text=Merhaba%2C%20ürünleriniz%20hakkında%20bilgi%20almak%20istiyorum.','_blank')">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          <span data-tr="WhatsApp ile Yaz" data-en="Chat on WhatsApp">WhatsApp ile Yaz</span>
+        </button>
+      </div>
+      <!-- FORM -->
+      <div class="quote-form">
+        <div id="formContent">
+          <div class="form-title" data-tr="TEKLİF FORMU" data-en="QUOTE FORM">TEKLİF FORMU</div>
+          <p class="form-sub" data-tr="Aşağıdaki formu doldurun, en kısa sürede dönelim." data-en="Fill out the form and we'll get back to you shortly.">Aşağıdaki formu doldurun, en kısa sürede dönelim.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" data-tr="AD SOYAD *" data-en="FULL NAME *">AD SOYAD *</label><input type="text" class="form-input" id="f-name" placeholder="Ahmet Yılmaz"></div>
+            <div class="form-group"><label class="form-label" data-tr="ŞİRKET" data-en="COMPANY">ŞİRKET</label><input type="text" class="form-input" id="f-company" placeholder="Şirket adı"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">E-POSTA *</label><input type="email" class="form-input" id="f-email" placeholder="email@sirket.com"></div>
+            <div class="form-group"><label class="form-label" data-tr="TELEFON" data-en="PHONE">TELEFON</label><input type="tel" class="form-input" id="f-phone" placeholder="+90 5XX XXX XX XX"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-tr="MÜŞTERİ TİPİ" data-en="CUSTOMER TYPE">MÜŞTERİ TİPİ</label>
+            <select class="form-select" id="f-type">
+              <option value="" data-tr="— Seçiniz —" data-en="— Select —">— Seçiniz —</option>
+              <option value="b2b" data-tr="Kurumsal (Tersane / Gemi İşletmecisi)" data-en="Corporate (Shipyard / Ship Operator)">Kurumsal (Tersane / Gemi İşletmecisi)</option>
+              <option value="b2c" data-tr="Bireysel" data-en="Individual">Bireysel</option>
+              <option value="reseller" data-tr="Bayi / Distribütör" data-en="Dealer / Distributor">Bayi / Distribütör</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-tr="ÜRÜN / TALEP *" data-en="PRODUCT / REQUEST *">ÜRÜN / TALEP *</label>
+            <textarea class="form-textarea" id="f-message" placeholder="Aradığınız ürün, stok kodu veya ihtiyacınızı yazın..."></textarea>
+          </div>
+          <button class="form-submit" onclick="submitForm()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span data-tr="Teklif Talebi Gönder" data-en="Send Quote Request">Teklif Talebi Gönder</span>
+          </button>
+        </div>
+        <div class="form-success" id="formSuccess">
+          <div class="fs-icon">✓</div>
+          <div class="fs-title" data-tr="TALEBİNİZ ALINDI!" data-en="REQUEST RECEIVED!">TALEBİNİZ ALINDI!</div>
+          <p class="fs-desc" data-tr="En geç 24 saat içinde size dönüş yapılacaktır." data-en="You will be contacted within 24 hours.">En geç 24 saat içinde size dönüş yapılacaktır.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><div class="nav-pulse"></div>DEEP MARINE <span style="color:var(--accent)">SERVICES</span></div>
+        <p class="footer-desc" data-tr="Denizcilik sektörüne orijinal ekipman ve yedek parça tedariki. Tuzla, İstanbul." data-en="Original equipment and spare parts for the maritime sector. Tuzla, Istanbul.">Denizcilik sektörüne orijinal ekipman ve yedek parça tedariki. Tuzla, İstanbul.</p>
+      </div>
+      <div><div class="fc-title" data-tr="Kategoriler" data-en="Categories">Kategoriler</div><div class="fc-links"><a href="#products" onclick="filterProds('Elektrik')">Elektrik</a><a href="#products" onclick="filterProds('Otomasyon')">Otomasyon</a><a href="#products" onclick="filterProds('Solar')">Solar</a><a href="#products" onclick="filterProds('Balast')">Balast</a><a href="#products" onclick="filterProds('Isıtma')">Isıtma</a></div></div>
+      <div><div class="fc-title" data-tr="Şirket" data-en="Company">Şirket</div><div class="fc-links"><a href="#why" data-tr="Hakkımızda" data-en="About">Hakkımızda</a><a href="#contact" data-tr="İletişim" data-en="Contact">İletişim</a><a href="#contact" data-tr="Teklif Al" data-en="Get Quote">Teklif Al</a></div></div>
+      <div><div class="fc-title" data-tr="Sertifikalar" data-en="Certifications">Sertifikalar</div><div class="fc-links"><a>IMO Sertifikalı</a><a>SOLAS Uyumlu</a><a>ISO 9001</a></div></div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Deep Marine Services. <span data-tr="Tüm hakları saklıdır." data-en="All rights reserved.">Tüm hakları saklıdır.</span></div>
+      <div class="footer-badges"><div class="fbadge">IMO</div><div class="fbadge">SOLAS</div><div class="fbadge">ISO 9001</div></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ PRODUCT MODAL ══ -->
+<div class="modal-overlay" id="prodModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div>
+        <div class="prod-cat" id="m-cat"></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.03em;color:var(--text)" id="m-name"></div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-3);margin-top:3px" id="m-code"></div>
+      </div>
+      <button class="modal-close" onclick="closeProdModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-img" id="m-img">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-3)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;opacity:.6" data-tr="ÜRÜN GÖRSELİ" data-en="PRODUCT IMAGE">ÜRÜN GÖRSELİ</span></div>
+      </div>
+      <!-- image thumbs -->
+      <div id="m-thumbs" style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"></div>
+      <div class="modal-meta">
+        <div class="mm-item"><div class="mm-label" data-tr="FİYAT" data-en="PRICE">FİYAT</div><div class="mm-val" id="m-price"></div></div>
+        <div class="mm-item"><div class="mm-label" data-tr="STOK" data-en="STOCK">STOK</div><div class="mm-val" id="m-stock"></div></div>
+        <div class="mm-item"><div class="mm-label" data-tr="KONUM" data-en="LOCATION">KONUM</div><div class="mm-val" id="m-loc"></div></div>
+      </div>
+      <p class="modal-desc" id="m-desc"></p>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="quoteFromModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span data-tr="Teklif İste" data-en="Request Quote">Teklif İste</span>
+        </button>
+        <button class="wa-btn" id="m-wa" style="margin-top:0;padding:11px 20px;font-size:13px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN LOGIN ══ -->
+<div class="login-overlay" id="loginOverlay" style="display:none">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:var(--accent-dim);border:1px solid var(--border);border-radius:12px;color:var(--accent)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="3"/>
+          <line x1="12" y1="8" x2="12" y2="22"/>
+          <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
+        </svg>
+      </div>
+    </div>
+    <div class="login-title">ADMIN GİRİŞİ</div>
+    <p class="login-sub" data-tr="Yönetim paneline erişmek için şifrenizi girin." data-en="Enter your password to access the admin panel.">Yönetim paneline erişmek için şifrenizi girin.</p>
+    <div class="login-error" id="loginError" data-tr="Hatalı şifre. Tekrar deneyin." data-en="Incorrect password. Please try again.">Hatalı şifre. Tekrar deneyin.</div>
+    <div class="form-group"><label class="form-label" data-tr="ŞİFRE" data-en="PASSWORD">ŞİFRE</label><input type="password" class="form-input" id="loginPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkLogin()"></div>
+    <button class="form-submit" onclick="checkLogin()" style="margin-top:8px" data-tr="Giriş Yap" data-en="Login">Giriş Yap</button>
+    <button onclick="closeLogin()" style="width:100%;margin-top:10px;background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:13px;padding:8px" data-tr="Vazgeç" data-en="Cancel">Vazgeç</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div id="adminPanel">
+  <div class="admin-nav">
+    <div class="admin-brand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="22"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+      DEEP MARINE SERVICES <span class="admin-badge">ADMIN</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn-admin btn-green" id="adminAddBtn" onclick="openAddForm()">+ Yeni Ürün</button>
+      <button class="btn-admin btn-edit" onclick="closeAdmin()">← Siteye Dön</button>
+      <button class="btn-admin btn-del" onclick="logout()">Çıkış</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <!-- Tab Buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border-2);padding-bottom:0">
+      <button class="admin-tab-btn active" data-tab="products" onclick="switchAdminTab('products')" style="background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 18px;cursor:pointer;transition:all .2s">ÜRÜNLER</button>
+      <button class="admin-tab-btn" data-tab="sales" onclick="switchAdminTab('sales')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-3);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 18px;cursor:pointer;transition:all .2s">SATIŞLAR</button>
+    </div>
+
+    <!-- TAB: Ürünler -->
+    <div id="tab-products">
+      <div class="admin-grid" id="adminStats"></div>
+      <div style="margin-top:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="admin-section-title">ÜRÜN LİSTESİ</div>
+          <input type="text" class="form-input" style="max-width:240px;padding:8px 12px;font-size:13px" placeholder="Ürün ara..." oninput="adminSearch(this.value)">
+        </div>
+        <table class="admin-prod-table" id="adminTable">
+          <thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Satışlar -->
+    <div id="tab-sales" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div class="admin-section-title">SATIŞ KAYITLARI</div>
+        <button class="btn-admin btn-green" onclick="openSaleForm()">+ Yeni Satış</button>
+      </div>
+      <table class="admin-prod-table">
+        <thead><tr><th>Tarih</th><th>Müşteri</th><th>Ürünler</th><th>Toplam</th><th>Ödeme</th><th>İşlem</th></tr></thead>
+        <tbody id="salesTableBody"><tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:40px;font-family:'DM Mono',monospace;font-size:12px">Yükleniyor...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN FORM (ekle/düzenle) ══ -->
+<div class="admin-form-overlay" id="adminFormOverlay">
+  <div class="admin-form-box">
+    <div class="admin-form-hdr">
+      <div class="admin-form-title" id="adminFormTitle">YENİ ÜRÜN</div>
+      <button class="modal-close" onclick="closeAdminForm()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="admin-form-body">
+      <input type="hidden" id="af-id">
+      <!-- Görsel yükleme -->
+      <div class="form-group">
+        <label class="form-label">ÜRÜN GÖRSELLERİ (maks. 6)</label>
+        <div class="img-upload-zone" id="uploadZone">
+          <input type="file" accept="image/*" multiple id="imgFileInput" onchange="handleImgUpload(this)">
+          <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="upload-text">Fotoğraf yüklemek için tıklayın veya sürükleyin</div>
+          <div class="upload-hint">JPG, PNG, WEBP · Maks. 5MB · Çoklu seçim yapabilirsiniz</div>
+        </div>
+        <div class="img-preview-grid" id="imgPreviewGrid"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">PARÇA ADI *</label><input type="text" class="form-input" id="af-name" placeholder="Main switchboard sigortası 63A"></div>
+        <div class="form-group"><label class="form-label">STOK KODU</label><input type="text" class="form-input" id="af-code" placeholder="DMS-EL-0241" style="font-family:'DM Mono',monospace"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">KATEGORİ</label>
+          <input type="text" class="form-input" id="af-cat" list="af-cat-list" placeholder="Elektrik">
+          <datalist id="af-cat-list"><option>Elektrik</option><option>Otomasyon</option><option>Isıtma</option><option>Solar</option><option>Balast</option><option>Sarf</option></datalist>
+        </div>
+        <div class="form-group">
+          <label class="form-label">BİRİM</label>
+          <select class="form-select" id="af-unit"><option>Adet</option><option>Metre</option><option>Kg</option><option>Litre</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">BİRİM FİYAT ($) *</label><input type="number" class="form-input" id="af-price" value="0" step="0.01" min="0"></div>
+        <div class="form-group"><label class="form-label">STOK ADEDİ</label><input type="number" class="form-input" id="af-stock" value="0" min="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">MİN. STOK SEVİYESİ</label><input type="number" class="form-input" id="af-min" value="5" min="0"></div>
+        <div class="form-group"><label class="form-label">KONUM (RAF)</label><input type="text" class="form-input" id="af-loc" placeholder="A-12"></div>
+      </div>
+      <div class="form-group"><label class="form-label">AÇIKLAMA</label><textarea class="form-textarea" id="af-desc" placeholder="Ürün teknik detayları, uyumlu sistemler..."></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="form-submit" onclick="saveProduct()" style="flex:1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Kaydet
+        </button>
+        <button onclick="closeAdminForm()" style="background:var(--bg-3);border:1px solid var(--border-2);color:var(--text-2);font-size:14px;padding:14px 20px;border-radius:8px;cursor:pointer;font-family:inherit">Vazgeç</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ SATIŞ FORMU ══ -->
+<div class="admin-form-overlay" id="saleFormOverlay">
+  <div class="admin-form-box">
+    <div class="admin-form-hdr">
+      <div class="admin-form-title">YENİ SATIŞ KAYDI</div>
+      <button class="modal-close" onclick="closeSaleForm()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="admin-form-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">MÜŞTERİ *</label>
+          <select class="form-select" id="sale-customer"><option value="">— Müşteri Seçin —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ÖDEME DURUMU</label>
+          <select class="form-select" id="sale-payment">
+            <option value="pending">Bekliyor</option>
+            <option value="paid">Ödendi</option>
+            <option value="cancelled">İptal</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ÜRÜNLER *</label>
+        <div id="saleItemsWrap"></div>
+        <button onclick="saleItems.push({productId:'',qty:1,price:0});renderSaleItems()" style="background:var(--accent-dim);border:1px solid var(--border);color:var(--accent);font-size:12px;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:6px;font-family:inherit">+ Ürün Ekle</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-3);border:1px solid var(--border-2);border-radius:8px;padding:14px 18px;margin-bottom:14px">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-3)">TOPLAM</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent)" id="saleTotalDisplay">$0.00</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">NOTLAR</label>
+        <textarea class="form-textarea" id="sale-notes" placeholder="Sipariş notu, teslimat bilgisi..." style="min-height:70px"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="form-submit" onclick="saveSale()" style="flex:1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Satışı Kaydet
+        </button>
+        <button onclick="closeSaleForm()" style="background:var(--bg-3);border:1px solid var(--border-2);color:var(--text-2);font-size:14px;padding:14px 20px;border-radius:8px;cursor:pointer;font-family:inherit">Vazgeç</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gizli admin erişim: URL'de #admin yaz veya sayfanın en altına 5 kez tıkla -->
+<div id="adminTrigger" style="position:fixed;bottom:0;right:0;width:60px;height:60px;cursor:default;z-index:50" onclick="adminTriggerClick()"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ════════════════════════════════════
+// SUPABASE BAĞLANTISI
+// ════════════════════════════════════
+const SUPABASE_URL = 'https://nlprnbagviljtmojdgpf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5scHJuYmFndmlsanRtb2pkZ3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MTk1ODIsImV4cCI6MjA5MzM5NTU4Mn0.PwEVOv_cWA5Z6lI8ob3h51dT9yqzAGCmJdrgE-t-G60';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ════════════════════════════════════
+// VERİ
+// ════════════════════════════════════
+const ADMIN_PASSWORD = 'deepmarine2026';
+
+let products = [
+  {id:1,code:'DMS-EL-0241',name:'Main Switchboard Sigortası 63A',cat:'Elektrik',loc:'A-12',stock:24,min:10,priceUsd:50,unit:'Adet',desc:'Ana dağıtım panosu için 63A sigorta. IEC 60947-2 standardına uygun, yüksek kırma kapasiteli.',images:[]},
+  {id:2,code:'DMS-IS-0118',name:'Boiler Termostat Sensörü',cat:'Isıtma',loc:'B-04',stock:2,min:8,priceUsd:126,unit:'Adet',desc:'Gemi kazanları için hassas sıcaklık kontrol sensörü. -20°C ile +150°C, IP67.',images:[]},
+  {id:3,code:'DMS-OT-0073',name:'CPP Dümen Hidrolik Valf',cat:'Otomasyon',loc:'C-21',stock:5,min:6,priceUsd:164,unit:'Adet',desc:'CPP ve dümen sistemleri için 350 bar hidrolik kontrol valfi.',images:[]},
+  {id:4,code:'DMS-SO-0029',name:'Solar Panel 450W Monokristal',cat:'Solar',loc:'D-01',stock:16,min:8,priceUsd:125,unit:'Adet',desc:'Tuzlu suya dayanıklı 450W monokristal panel. %21.5 verimlilik, 25 yıl garanti.',images:[]},
+  {id:5,code:'DMS-BA-0055',name:'Balast UV Lambası',cat:'Balast',loc:'B-18',stock:8,min:10,priceUsd:83,unit:'Adet',desc:'IMO D-2 BWTS için yüksek yoğunluklu UV lambası. 9000 saat ömür.',images:[]},
+  {id:6,code:'DMS-EL-0182',name:'Jeneratör AVR Modülü',cat:'Elektrik',loc:'A-08',stock:4,min:6,priceUsd:322,unit:'Adet',desc:'Otomatik voltaj regülatörü. %0.5 hassasiyet, tüm jeneratör markaları ile uyumlu.',images:[]},
+  {id:7,code:'DMS-OT-0115',name:'Alarm Monitoring Panel',cat:'Otomasyon',loc:'C-15',stock:3,min:4,priceUsd:491,unit:'Adet',desc:'64 kanal gemi izleme ve alarm sistemi. NMEA 2000 uyumlu, dokunmatik.',images:[]},
+  {id:8,code:'DMS-IS-0094',name:'Boiler Kazan Basınç Valfi',cat:'Isıtma',loc:'B-09',stock:1,min:5,priceUsd:188,unit:'Adet',desc:'6 bar emniyet valfi. DN25, paslanmaz çelik gövde.',images:[]},
+  {id:9,code:'DMS-SO-0064',name:'Solar Şarj Kontrolörü 60A MPPT',cat:'Solar',loc:'D-12',stock:12,min:6,priceUsd:142,unit:'Adet',desc:'60A MPPT şarj kontrolörü. 12/24/48V otomatik, %99.5 verimlilik.',images:[]},
+  {id:10,code:'DMS-EL-0220',name:'Seyir Cihazı GPS Anteni',cat:'Elektrik',loc:'A-20',stock:7,min:4,priceUsd:81,unit:'Adet',desc:'GPS/GLONASS anten. IP68, -40°C ile +85°C çalışma aralığı.',images:[]},
+  {id:11,code:'DMS-BA-0072',name:'BWTS Filtre Kartuşu',cat:'Balast',loc:'B-22',stock:0,min:8,priceUsd:56,unit:'Adet',desc:'50 mikron BWTS filtre. 6 ay değişim periyodu, IMO tip onaylı.',images:[]},
+  {id:12,code:'DMS-SF-0301',name:'Bakır Kablo 35mm²',cat:'Sarf',loc:'E-01',stock:248,min:100,priceUsd:3.69,unit:'Metre',desc:'Halogen-free bakır kablo. 35mm², 750V, IEC 60092 sertifikalı.',images:[]},
+];
+
+let currentFilter = 'all';
+let currentLang = 'tr';
+let activeProdId = null;
+let pendingImageFiles = [];
+let pendingImages = [];
+let adminTriggerCount = 0;
+let adminTriggerTimer = null;
+let editingId = null;
+
+// ════════════════════════════════════
+// SUPABASE VERİ YÜKLEME
+// ════════════════════════════════════
+async function loadProducts() {
+  const { data, error } = await sb
+    .from('products')
+    .select('*, product_images(id, url, order_index)')
+    .order('id');
+  if (error) { console.error('Ürün yükleme hatası:', error); showToast('⚠ Veri yüklenemedi'); return; }
+  products = (data || []).map(p => ({
+    id: p.id,
+    code: p.code,
+    name: p.name,
+    cat: p.cat,
+    loc: p.loc,
+    stock: p.stock,
+    min: p.min_stock,
+    priceUsd: p.price_usd,
+    unit: p.unit,
+    desc: p.description,
+    images: (p.product_images || [])
+      .sort((a,b) => a.order_index - b.order_index)
+      .map(img => img.url),
+    imageRecords: p.product_images || []
+  }));
+  renderHeroMockup();
+  renderCats();
+  renderProds();
+  observeFade();
+}
+
+async function uploadImageToStorage(file, productId, index) {
+  const ext = file.name.split('.').pop();
+  const path = `${productId}/${Date.now()}_${index}.${ext}`;
+  const { error } = await sb.storage.from('product-images').upload(path, file, { upsert: true });
+  if (error) { console.error('Görsel yükleme hatası:', error); return null; }
+  const { data } = sb.storage.from('product-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ════════════════════════════════════
+// TEMA
+// ════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  updateDepthLabel(!isDark);
+}
+function updateDepthLabel(isDark) {
+  const label = document.getElementById('depthLabel');
+  if (isDark) {
+    label.textContent = currentLang === 'tr' ? '● 3000m' : '● 3000m';
+    label.style.color = 'var(--text-3)';
+  } else {
+    label.textContent = currentLang === 'tr' ? '● Yüzey' : '● Surface';
+    label.style.color = 'var(--accent)';
+  }
+}
+
+// ════════════════════════════════════
+// DİL
+// ════════════════════════════════════
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+
+  // lang buttons
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+
+  // update all [data-tr] elements
+  document.querySelectorAll('[data-tr]').forEach(el => {
+    const txt = el.getAttribute(`data-${lang}`);
+    if (!txt) return;
+    // skip inputs/textareas (use placeholder attr instead)
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      const phAttr = `data-${lang}-placeholder`;
+      if (el.hasAttribute(phAttr)) el.placeholder = el.getAttribute(phAttr);
+      return;
+    }
+    // contains HTML (e.g. <span>) → innerHTML
+    if (txt.includes('<')) { el.innerHTML = txt; return; }
+    el.textContent = txt;
+  });
+
+  // select options
+  document.querySelectorAll('select option[data-tr]').forEach(o => {
+    const t = o.getAttribute(`data-${lang}`);
+    if (t) o.textContent = t;
+  });
+
+  // special headings with inner <span> color
+  const headings = {
+    heroH1: {
+      tr: 'DENİZCİLİK <span>EKİPMAN</span><br>& YEDEK PARÇA',
+      en: 'MARINE <span>EQUIPMENT</span><br>& SPARE PARTS'
+    },
+    whyTitle: {
+      tr: 'SEKTÖRÜN <span>GÜVENİLİR</span> ORTAĞI',
+      en: "THE INDUSTRY'S <span>TRUSTED</span> PARTNER"
+    },
+    contactTitle: {
+      tr: 'HIZLI <span>TEKLİF</span> ALIN',
+      en: 'GET A <span>FAST</span> QUOTE'
+    }
+  };
+  Object.entries(headings).forEach(([id, texts]) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = texts[lang];
+  });
+
+  // page title
+  document.title = lang === 'tr'
+    ? 'Deep Marine Services — Denizcilik Ekipman & Yedek Parça'
+    : 'Deep Marine Services — Marine Equipment & Spare Parts';
+
+  // depth label stays as-is (theme-based)
+  renderProds();
+  renderCats();
+  renderHeroMockup();
+}
+
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function dmScrollTo(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+function getStatus(p) { return p.stock===0?'out':p.stock<p.min?'low':'ok'; }
+function badgeCls(p) { return {ok:'b-ok',low:'b-low',out:'b-out'}[getStatus(p)]; }
+function badgeTxt(p) {
+  const s=getStatus(p);
+  return currentLang==='tr'
+    ? {ok:'Stokta',low:'Son Kalan',out:'Stok Yok'}[s]
+    : {ok:'In Stock',low:'Low Stock',out:'Out of Stock'}[s];
+}
+function stockLabel(p) {
+  const s=getStatus(p);
+  return currentLang==='tr'
+    ? {ok:`Stokta (${p.stock} ${p.unit})`,low:`Azalıyor (${p.stock} ${p.unit})`,out:'Stok yok'}[s]
+    : {ok:`In Stock (${p.stock} ${p.unit})`,low:`Running Low (${p.stock} ${p.unit})`,out:'Out of Stock'}[s];
+}
+function fmtUsd(v){ return '$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function saveStorage(){ /* Supabase kullanılıyor, localStorage gerekmez */ }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// ════════════════════════════════════
+// HERO MOCKUP
+// ════════════════════════════════════
+function renderHeroMockup() {
+  const list = document.getElementById('heroMockupList');
+  const preview = [...products].slice(0,4);
+  const catAbbr = {Elektrik:'EL',Otomasyon:'OT',Isıtma:'IS',Solar:'SO',Balast:'BA',Sarf:'SF'};
+  list.innerHTML = preview.map(p=>`
+    <div class="mproduct">
+      <div class="mproduct-icon">${catAbbr[p.cat]||'••'}</div>
+      <div style="flex:1;min-width:0">
+        <div class="mproduct-name">${p.name}</div>
+        <div class="mproduct-code">${p.code}</div>
+      </div>
+      <div class="mproduct-price">${fmtUsd(p.priceUsd)}</div>
+      <div class="mdot mdot-${getStatus(p)}"></div>
+    </div>`).join('');
+  document.getElementById('heroStatCount').textContent = products.length;
+}
+
+// ════════════════════════════════════
+// CATEGORIES
+// ════════════════════════════════════
+const catIcons = {
+  Elektrik:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  Otomasyon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06"/>',
+  Isıtma:'<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>',
+  Solar:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>',
+  Balast:'<path d="M12 2v6"/><path d="M5 8h14l-1 13H6L5 8z"/>',
+  Sarf:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>'
+};
+const catSubTr = {Elektrik:'Sigorta, AVR, GPS, jeneratör parçaları',Otomasyon:'Hidrolik valf, alarm panel, kontrol',Solar:'Monokristal panel, MPPT kontrolör',Balast:'UV lamba, BWTS filtre, pompa parçaları',Isıtma:'Boiler termostat, kazan valfi, sensör',Sarf:'Kablo, conta, cıvata, bağlantı malzemesi'};
+const catSubEn = {Elektrik:'Fuses, AVR, GPS, generator parts',Otomasyon:'Hydraulic valves, alarm panels, control',Solar:'Monocrystalline panels, MPPT controller',Balast:'UV lamps, BWTS filters, pump parts',Isıtma:'Boiler thermostat, pressure valves',Sarf:'Cables, gaskets, bolts, fittings'};
+
+function renderCats() {
+  const cats = [...new Set(products.map(p=>p.cat))];
+  document.getElementById('catGrid').innerHTML = cats.map(cat=>`
+    <div class="cat-card fade-in" onclick="filterProds('${cat}',null,true)">
+      <div class="cat-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${catIcons[cat]||''}</svg>
+      </div>
+      <div class="cat-name">${cat.toUpperCase()}</div>
+      <div class="cat-sub">${currentLang==='tr'?(catSubTr[cat]||''):(catSubEn[cat]||'')}</div>
+      <div class="cat-arrow"><span>${currentLang==='tr'?'Ürünleri gör':'View products'}</span> <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+    </div>`).join('');
+  observeFade();
+}
+
+// ════════════════════════════════════
+// PRODUCTS
+// ════════════════════════════════════
+function filterProds(cat, btn, scrollToSec) {
+  currentFilter = cat;
+  document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));
+  if (btn) { btn.classList.add('active'); }
+  else {
+    document.querySelectorAll('.fpill').forEach(b=>{
+      if (b.getAttribute('data-tr')===cat||b.getAttribute('data-en')===cat||b.textContent.trim()===cat) b.classList.add('active');
+    });
+    // reset to 'all' pill if 'all'
+    if (cat==='all') document.querySelector('.fpill')?.classList.add('active');
+  }
+  renderProds();
+  if (scrollToSec) setTimeout(()=>dmScrollTo('products'), 80);
+}
+
+function renderProds(filter) {
+  if (filter!==undefined) currentFilter=filter;
+  const grid = document.getElementById('prodGrid');
+  let data = currentFilter==='all' ? products : products.filter(p=>p.cat===currentFilter);
+
+  grid.innerHTML = data.map(p=>{
+    const hasImg = p.images && p.images.length > 0;
+    const imgHtml = hasImg
+      ? `<img src="${p.images[0]}" alt="${p.name}">`
+      : `<div class="prod-img-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>${p.code}</span></div>`;
+    return `
+    <div class="prod-card fade-in" onclick="openProdModal(${p.id})">
+      <div class="prod-img">
+        <div class="prod-badge ${badgeCls(p)}">${badgeTxt(p)}</div>
+        ${imgHtml}
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat">${p.cat.toUpperCase()}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-code">${p.code}</div>
+        <div class="prod-footer">
+          <div>
+            <div class="prod-price">${fmtUsd(p.priceUsd)}</div>
+            <div class="prod-price-sub">/ ${p.unit}</div>
+          </div>
+          <button class="btn-quote" onclick="event.stopPropagation();quoteById(${p.id})">${currentLang==='tr'?'Teklif İste':'Get Quote'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (!data.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-3);font-family:'DM Mono',monospace;font-size:13px">${currentLang==='tr'?'Bu kategoride ürün bulunamadı':'No products found in this category'}</div>`;
+  }
+  observeFade();
+}
+
+// ════════════════════════════════════
+// PRODUCT MODAL
+// ════════════════════════════════════
+function openProdModal(id) {
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  activeProdId = id;
+  document.getElementById('m-cat').textContent = p.cat.toUpperCase();
+  document.getElementById('m-name').textContent = p.name;
+  document.getElementById('m-code').textContent = p.code;
+  document.getElementById('m-price').textContent = fmtUsd(p.priceUsd) + ' / ' + p.unit;
+  document.getElementById('m-stock').innerHTML = `<span style="color:${getStatus(p)==='ok'?'#28CA41':getStatus(p)==='low'?'#FFBD2E':'#FF5F57'}">${stockLabel(p)}</span>`;
+  document.getElementById('m-loc').textContent = 'Tuzla · ' + p.loc;
+  document.getElementById('m-desc').textContent = p.desc || '';
+
+  // image
+  const mImg = document.getElementById('m-img');
+  if (p.images && p.images.length > 0) {
+    mImg.innerHTML = `<img src="${p.images[0]}" alt="${p.name}">`;
+  } else {
+    mImg.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-3)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;opacity:.6">ÜRÜN GÖRSELİ</span></div>`;
+  }
+
+  // thumbs
+  const thumbs = document.getElementById('m-thumbs');
+  if (p.images && p.images.length > 1) {
+    thumbs.innerHTML = p.images.map((img,i)=>`
+      <img src="${img}" style="width:56px;height:56px;object-fit:cover;border-radius:7px;border:2px solid ${i===0?'var(--accent)':'var(--border-2)'};cursor:pointer;" onclick="switchModalImg('${img}',this)">`).join('');
+    thumbs.style.display = 'flex';
+  } else {
+    thumbs.innerHTML = '';
+    thumbs.style.display = 'none';
+  }
+
+  document.getElementById('m-wa').onclick = ()=>{
+    const msg = encodeURIComponent(`Merhaba, ${p.name} (${p.code}) için teklif almak istiyorum.`);
+    window.open(`https://wa.me/90216XXXXXXX?text=${msg}`,'_blank');
+  };
+  document.getElementById('prodModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function switchModalImg(src, el) {
+  document.getElementById('m-img').innerHTML = `<img src="${src}" alt="">`;
+  el.parentElement.querySelectorAll('img').forEach(i=>i.style.borderColor='var(--border-2)');
+  el.style.borderColor = 'var(--accent)';
+}
+function closeProdModal() {
+  document.getElementById('prodModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('prodModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('prodModal')) closeProdModal();
+});
+function quoteFromModal() {
+  const p = products.find(x=>x.id===activeProdId);
+  if (!p) return;
+  closeProdModal();
+  document.getElementById('f-message').value = `${p.name} (${p.code}) — `;
+  dmScrollTo('contact');
+  setTimeout(()=>document.getElementById('f-message').focus(),600);
+}
+function quoteById(id) {
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  document.getElementById('f-message').value = `${p.name} (${p.code}) — `;
+  dmScrollTo('contact');
+  setTimeout(()=>document.getElementById('f-message').focus(),500);
+}
+
+// ════════════════════════════════════
+// CONTACT FORM
+// ════════════════════════════════════
+async function submitForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const msg = document.getElementById('f-message').value.trim();
+  if (!name||!email||!msg) { showToast(currentLang==='tr'?'⚠ Zorunlu alanları doldurun':'⚠ Please fill required fields'); return; }
+
+  const btn = document.querySelector('.quote-form .form-submit');
+  btn.disabled = true;
+  btn.textContent = currentLang==='tr' ? 'Gönderiliyor...' : 'Sending...';
+
+  try {
+    const company = document.getElementById('f-company')?.value.trim() || '';
+    const phone = document.getElementById('f-phone')?.value.trim() || '';
+    const custType = document.getElementById('f-type')?.value || '';
+    await sb.from('messages').insert({ name, email, company, phone, type: custType, message: msg });
+  } catch(e) { console.warn('Mesaj kaydı:', e); }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> <span data-tr="Teklif Talebi Gönder" data-en="Send Quote Request">${currentLang==='tr'?'Teklif Talebi Gönder':'Send Quote Request'}</span>`;
+  document.getElementById('formContent').style.display='none';
+  document.getElementById('formSuccess').style.display='block';
+  showToast(currentLang==='tr'?'✓ Talebiniz iletildi!':'✓ Your request was sent!');
+}
+
+// ════════════════════════════════════
+// ADMIN ACCESS
+// ════════════════════════════════════
+function adminTriggerClick() {
+  adminTriggerCount++;
+  clearTimeout(adminTriggerTimer);
+  adminTriggerTimer = setTimeout(()=>adminTriggerCount=0, 3000);
+  if (adminTriggerCount >= 5) { adminTriggerCount=0; openLogin(); }
+}
+window.addEventListener('keydown', e=>{
+  if (e.ctrlKey && e.shiftKey && e.key==='A') openLogin();
+});
+window.addEventListener('hashchange',()=>{ if(location.hash==='#admin') { location.hash=''; openLogin(); } });
+if (location.hash==='#admin') { location.hash=''; openLogin(); }
+
+function openLogin() {
+  document.getElementById('loginOverlay').style.display='flex';
+  setTimeout(()=>document.getElementById('loginPw').focus(), 100);
+}
+function closeLogin() {
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('loginPw').value='';
+  document.getElementById('loginError').style.display='none';
+}
+function checkLogin() {
+  const pw = document.getElementById('loginPw').value;
+  if (pw === ADMIN_PASSWORD) {
+    closeLogin();
+    openAdmin();
+  } else {
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('loginPw').value='';
+    document.getElementById('loginPw').focus();
+  }
+}
+function openAdmin() {
+  document.getElementById('adminPanel').style.display='block';
+  document.body.style.overflow='hidden';
+  renderAdminStats();
+  renderAdminTable(products);
+  loadSales();
+}
+function closeAdmin() {
+  document.getElementById('adminPanel').style.display='none';
+  document.body.style.overflow='';
+}
+function logout() { closeAdmin(); showToast('Çıkış yapıldı'); }
+
+// ════════════════════════════════════
+// ADMIN RENDER
+// ════════════════════════════════════
+function renderAdminStats() {
+  const total = products.length;
+  const critical = products.filter(p=>getStatus(p)==='critical'||p.stock===0).length;
+  const low = products.filter(p=>getStatus(p)==='low').length;
+  const value = products.reduce((s,p)=>s+p.priceUsd*p.stock,0);
+  document.getElementById('adminStats').innerHTML = `
+    <div class="admin-card"><div class="admin-card-title">TOPLAM ÜRÜN</div><div class="admin-card-val">${total}</div></div>
+    <div class="admin-card"><div class="admin-card-title">KRİTİK STOK</div><div class="admin-card-val" style="color:#FF5F57">${critical}</div></div>
+    <div class="admin-card"><div class="admin-card-title">DÜŞÜK STOK</div><div class="admin-card-val" style="color:#FFBD2E">${low}</div></div>
+    <div class="admin-card"><div class="admin-card-title">TOPLAM STOK DEĞERİ</div><div class="admin-card-val">${fmtUsd(value)}</div></div>`;
+}
+
+function renderAdminTable(data) {
+  const statusColor = {ok:'#28CA41',low:'#FFBD2E',out:'#FF5F57'};
+  const statusTxt = {ok:'Yeterli',low:'Düşük',out:'Kritik'};
+  document.getElementById('adminTableBody').innerHTML = data.map(p=>{
+    const s = getStatus(p);
+    const thumb = p.images&&p.images.length>0
+      ? `<div class="admin-thumb"><img src="${p.images[0]}" alt=""></div>`
+      : `<div class="admin-thumb-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    return `<tr>
+      <td>${thumb}</td>
+      <td><div style="font-weight:600;font-size:13px">${p.name}</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-3)">${p.code}</div></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">${p.cat}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:13px">${fmtUsd(p.priceUsd)}</td>
+      <td style="font-weight:600">${p.stock} ${p.unit}</td>
+      <td><span style="color:${statusColor[s]};font-size:12px;font-weight:600">● ${statusTxt[s]}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn-admin btn-edit" onclick="openEditForm(${p.id})">Düzenle</button>
+        <button class="btn-admin btn-del" onclick="deleteProduct(${p.id})">Sil</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function adminSearch(q) {
+  const filtered = q ? products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.code.toLowerCase().includes(q.toLowerCase())) : products;
+  renderAdminTable(filtered);
+}
+
+// ════════════════════════════════════
+// IMAGE UPLOAD
+// ════════════════════════════════════
+function handleImgUpload(input) {
+  const files = Array.from(input.files);
+  const remaining = 6 - pendingImages.length;
+  const toProcess = files.slice(0, remaining);
+  if (files.length > remaining) showToast(`⚠ En fazla 6 görsel yüklenebilir. ${files.length - remaining} dosya atlandı.`);
+
+  toProcess.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) { showToast(`⚠ ${file.name} 5MB'dan büyük, atlandı.`); return; }
+    // Preview için blob URL
+    const blobUrl = URL.createObjectURL(file);
+    pendingImages.push({ url: blobUrl, file: file, isNew: true });
+    renderImgPreview();
+  });
+  input.value = '';
+}
+
+function renderImgPreview() {
+  document.getElementById('imgPreviewGrid').innerHTML = pendingImages.map((img,i)=>`
+    <div class="img-preview-item">
+      <img src="${img.url}" alt="">
+      <button class="img-preview-del" onclick="removeImg(${i})">✕</button>
+      ${i===0?'<div style="position:absolute;bottom:4px;left:4px;background:var(--accent);color:var(--bg-0);font-size:9px;padding:2px 5px;border-radius:3px;font-family:DM Mono">ANA</div>':''}
+    </div>`).join('');
+
+  const zone = document.getElementById('uploadZone');
+  zone.style.opacity = pendingImages.length >= 6 ? '0.5' : '1';
+  zone.style.pointerEvents = pendingImages.length >= 6 ? 'none' : 'all';
+}
+
+function removeImg(i) { pendingImages.splice(i,1); renderImgPreview(); }
+
+// drag & drop
+['dragenter','dragover'].forEach(ev=>{
+  document.getElementById('uploadZone')?.addEventListener(ev,e=>{e.preventDefault();document.getElementById('uploadZone').classList.add('drag-over')});
+});
+['dragleave','drop'].forEach(ev=>{
+  document.getElementById('uploadZone')?.addEventListener(ev,e=>{e.preventDefault();document.getElementById('uploadZone').classList.remove('drag-over');if(ev==='drop'){const dt=e.dataTransfer;const input=document.getElementById('imgFileInput');input.files=dt.files;handleImgUpload(input);}});
+});
+
+// ════════════════════════════════════
+// ADMIN CRUD
+// ════════════════════════════════════
+function openAddForm() {
+  editingId = null;
+  pendingImages = [];
+  pendingImageFiles = [];
+  document.getElementById('adminFormTitle').textContent = 'YENİ ÜRÜN';
+  document.getElementById('af-id').value='';
+  document.getElementById('af-name').value='';
+  document.getElementById('af-code').value='';
+  document.getElementById('af-cat').value='';
+  document.getElementById('af-unit').value='Adet';
+  document.getElementById('af-price').value='0';
+  document.getElementById('af-stock').value='0';
+  document.getElementById('af-min').value='5';
+  document.getElementById('af-loc').value='';
+  document.getElementById('af-desc').value='';
+  renderImgPreview();
+  document.getElementById('adminFormOverlay').classList.add('open');
+}
+
+function openEditForm(id) {
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  editingId = id;
+  // Mevcut görselleri pendingImages'a ekle (isNew:false)
+  pendingImages = (p.images||[]).map(url => ({ url, file: null, isNew: false }));
+  document.getElementById('adminFormTitle').textContent = 'ÜRÜN DÜZENLE';
+  document.getElementById('af-id').value=id;
+  document.getElementById('af-name').value=p.name;
+  document.getElementById('af-code').value=p.code;
+  document.getElementById('af-cat').value=p.cat;
+  document.getElementById('af-unit').value=p.unit;
+  document.getElementById('af-price').value=p.priceUsd;
+  document.getElementById('af-stock').value=p.stock;
+  document.getElementById('af-min').value=p.min;
+  document.getElementById('af-loc').value=p.loc;
+  document.getElementById('af-desc').value=p.desc||'';
+  renderImgPreview();
+  document.getElementById('adminFormOverlay').classList.add('open');
+}
+
+function closeAdminForm() {
+  document.getElementById('adminFormOverlay').classList.remove('open');
+  pendingImages = [];
+  pendingImageFiles = [];
+}
+
+async function saveProduct() {
+  const name = document.getElementById('af-name').value.trim();
+  if (!name) { showToast('⚠ Parça adı zorunludur'); return; }
+
+  const cat = document.getElementById('af-cat').value.trim() || 'Genel';
+  const catPfx = cat.substring(0,2).toUpperCase();
+  const saveBtn = document.querySelector('#adminFormOverlay .form-submit');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Kaydediliyor...';
+
+  const productData = {
+    name,
+    code: document.getElementById('af-code').value.trim() || null,
+    cat,
+    unit: document.getElementById('af-unit').value,
+    price_usd: parseFloat(document.getElementById('af-price').value)||0,
+    stock: parseInt(document.getElementById('af-stock').value)||0,
+    min_stock: parseInt(document.getElementById('af-min').value)||5,
+    loc: document.getElementById('af-loc').value.trim() || 'A-01',
+    description: document.getElementById('af-desc').value.trim(),
+  };
+
+  let productId = editingId;
+
+  if (editingId) {
+    const { error } = await sb.from('products').update(productData).eq('id', editingId);
+    if (error) { showToast('⚠ Güncelleme hatası: ' + error.message); saveBtn.disabled=false; saveBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Kaydet'; return; }
+  } else {
+    // Kod otomatik oluştur
+    if (!productData.code) {
+      const count = products.length + 1;
+      productData.code = `DMS-${catPfx}-${String(count).padStart(4,'0')}`;
+    }
+    const { data, error } = await sb.from('products').insert(productData).select().single();
+    if (error) { showToast('⚠ Ekleme hatası: ' + error.message); saveBtn.disabled=false; saveBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Kaydet'; return; }
+    productId = data.id;
+  }
+
+  // Yeni görselleri yükle
+  const newImages = pendingImages.filter(img => img.isNew && img.file);
+  for (let i = 0; i < newImages.length; i++) {
+    const url = await uploadImageToStorage(newImages[i].file, productId, i);
+    if (url) {
+      await sb.from('product_images').insert({ product_id: productId, url, order_index: pendingImages.indexOf(newImages[i]) });
+    }
+  }
+
+  showToast(editingId ? '✓ Ürün güncellendi' : '✓ Ürün eklendi');
+  saveBtn.disabled=false;
+  saveBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Kaydet';
+  closeAdminForm();
+  await loadProducts();
+  renderAdminStats();
+  renderAdminTable(products);
+}
+
+async function deleteProduct(id) {
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  if (!confirm(`"${p.name}" silinecek. Emin misiniz?`)) return;
+  const { error } = await sb.from('products').delete().eq('id', id);
+  if (error) { showToast('⚠ Silme hatası: ' + error.message); return; }
+  await loadProducts();
+  renderAdminStats();
+  renderAdminTable(products);
+  showToast('✓ Ürün silindi');
+}
+
+// ════════════════════════════════════
+// SCROLL & ANIMATIONS
+// ════════════════════════════════════
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+function observeFade() {
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-in:not(.visible)').forEach(el=>obs.observe(el));
+}
+
+// ════════════════════════════════════
+// SATIŞ MODÜLü
+// ════════════════════════════════════
+let sales = [];
+let customers = [];
+
+async function loadSales() {
+  const { data: salesData } = await sb.from('sales')
+    .select('*, customers(name, company), sale_items(*, products(name, code, unit))')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  sales = salesData || [];
+  renderSalesTable();
+}
+
+async function loadCustomers() {
+  const { data } = await sb.from('customers').select('*').order('name');
+  customers = data || [];
+  const sel = document.getElementById('sale-customer');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Müşteri Seçin —</option>' +
+    customers.map(c => `<option value="${c.id}">${c.name}${c.company?' ('+c.company+')':''}</option>`).join('');
+}
+
+function renderSalesTable() {
+  const tbody = document.getElementById('salesTableBody');
+  if (!tbody) return;
+  if (!sales.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:40px;font-family:DM Mono,monospace;font-size:12px">Henüz satış kaydı yok</td></tr>'; return; }
+  tbody.innerHTML = sales.map(s => {
+    const cust = s.customers;
+    const items = s.sale_items || [];
+    const itemSummary = items.map(i => `${i.products?.name||'?'} x${i.quantity}`).join(', ');
+    const statusColor = {pending:'#FFBD2E', paid:'#28CA41', cancelled:'#FF5F57'}[s.payment_status] || '#888';
+    const statusTxt = {pending:'Bekliyor', paid:'Ödendi', cancelled:'İptal'}[s.payment_status] || s.payment_status;
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-3)">${new Date(s.created_at).toLocaleDateString('tr-TR')}</td>
+      <td><div style="font-weight:600;font-size:13px">${cust?.name||'—'}</div><div style="font-size:11px;color:var(--text-3)">${cust?.company||''}</div></td>
+      <td style="font-size:12px;color:var(--text-2);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${itemSummary}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)">${fmtUsd(s.total_usd||0)}</td>
+      <td><span style="color:${statusColor};font-size:12px;font-weight:600">● ${statusTxt}</span></td>
+      <td><button class="btn-admin btn-del" onclick="deleteSale(${s.id})">Sil</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function deleteSale(id) {
+  if (!confirm('Bu satış kaydı silinecek. Emin misiniz?')) return;
+  await sb.from('sales').delete().eq('id', id);
+  await loadSales();
+  showToast('✓ Satış silindi');
+}
+
+function openSaleForm() {
+  loadCustomers();
+  document.getElementById('saleFormOverlay').classList.add('open');
+  renderSaleItems();
+}
+function closeSaleForm() {
+  document.getElementById('saleFormOverlay').classList.remove('open');
+  saleItems = [];
+}
+
+let saleItems = [];
+function renderSaleItems() {
+  const wrap = document.getElementById('saleItemsWrap');
+  if (!wrap) return;
+  wrap.innerHTML = saleItems.map((item, i) => `
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:center;margin-bottom:8px">
+      <select class="form-select" onchange="saleItems[${i}].productId=this.value;saleItems[${i}].price=products.find(p=>p.id==this.value)?.priceUsd||0;renderSaleItems()">
+        <option value="">— Ürün —</option>
+        ${products.map(p=>`<option value="${p.id}" ${item.productId==p.id?'selected':''}>${p.name} (${p.code})</option>`).join('')}
+      </select>
+      <input type="number" class="form-input" placeholder="Adet" min="1" value="${item.qty||1}" onchange="saleItems[${i}].qty=parseInt(this.value)||1;renderSaleItems()" style="padding:9px 12px">
+      <input type="number" class="form-input" placeholder="Fiyat $" step="0.01" value="${item.price||''}" onchange="saleItems[${i}].price=parseFloat(this.value)||0;renderSaleItems()" style="padding:9px 12px;font-family:'DM Mono',monospace">
+      <button onclick="saleItems.splice(${i},1);renderSaleItems()" style="background:var(--bg-3);border:1px solid var(--border-2);color:#FF5F57;border-radius:6px;padding:9px 12px;cursor:pointer">✕</button>
+    </div>`).join('');
+  const total = saleItems.reduce((s,item)=>s+(item.qty||0)*(item.price||0),0);
+  document.getElementById('saleTotalDisplay').textContent = fmtUsd(total);
+}
+
+async function saveSale() {
+  const customerId = document.getElementById('sale-customer').value;
+  if (!customerId) { showToast('⚠ Müşteri seçin'); return; }
+  if (!saleItems.length || saleItems.some(i=>!i.productId)) { showToast('⚠ En az bir ürün ekleyin'); return; }
+
+  const total = saleItems.reduce((s,i)=>s+(i.qty||0)*(i.price||0),0);
+  const paymentStatus = document.getElementById('sale-payment').value;
+  const notes = document.getElementById('sale-notes').value.trim();
+
+  const { data: saleData, error } = await sb.from('sales').insert({
+    customer_id: customerId, payment_status: paymentStatus, notes, total_usd: total
+  }).select().single();
+  if (error) { showToast('⚠ Satış kaydı hatası'); return; }
+
+  // Satış kalemlerini kaydet + stok düş
+  for (const item of saleItems) {
+    await sb.from('sale_items').insert({
+      sale_id: saleData.id, product_id: item.productId,
+      quantity: item.qty, unit_price: item.price
+    });
+    // Stok düş
+    const prod = products.find(p=>p.id==item.productId);
+    if (prod) {
+      const newStock = Math.max(0, prod.stock - item.qty);
+      await sb.from('products').update({ stock: newStock }).eq('id', item.productId);
+    }
+  }
+
+  saleItems = [];
+  closeSaleForm();
+  await loadProducts();
+  await loadSales();
+  renderAdminStats();
+  renderAdminTable(products);
+  showToast('✓ Satış kaydedildi, stok güncellendi');
+}
+
+// Admin panel tab switching
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-pane').forEach(p=>p.style.display='none');
+  document.querySelector(`.admin-tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).style.display='block';
+  // Yeni Ürün butonu sadece ürünler sekmesinde görünsün
+  const addBtn = document.getElementById('adminAddBtn');
+  if (addBtn) addBtn.style.display = tab === 'products' ? '' : 'none';
+}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+loadProducts();
+</script>
+</body>
+</html>
