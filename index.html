@@ -1127,6 +1127,7 @@ async function loadProducts() {
   const { data, error } = await sb
     .from('products')
     .select('*, product_images(id, url, order_index)')
+    .or('visible.eq.true,visible.is.null')
     .order('id');
   if (error) { console.error('Ürün yükleme hatası:', error); showToast('⚠ Veri yüklenemedi'); return; }
   products = (data || []).map(p => ({
