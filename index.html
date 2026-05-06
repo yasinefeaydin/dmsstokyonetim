@@ -404,27 +404,190 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
 /* ── RESPONSIVE ── */
 .admin-tab-btn.active{color:var(--text)!important;border-bottom-color:var(--accent)!important}
 .admin-tab-btn:hover{color:var(--text)!important}
-@media(max-width:960px){
-  .hero-content{grid-template-columns:1fr;gap:32px}
-  .hero-visual{display:none}
-  .cat-grid{grid-template-columns:1fr 1fr}
-  .prod-grid{grid-template-columns:1fr 1fr}
-  .why-grid{grid-template-columns:1fr}
-  .why-cards{display:none}
-  .contact-grid{grid-template-columns:1fr}
-  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
-  .admin-grid{grid-template-columns:1fr 1fr}
-  nav{padding:0 20px}
-  .container{padding:0 20px}
-  .nav-links{display:none}
+
+/* ── HAMBURGER MENU ── */
+.nav-hamburger{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  width:40px;height:40px;
+  background:var(--bg-3);
+  border:1px solid var(--border-2);
+  border-radius:9px;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:all .25s;
 }
+.nav-hamburger span{
+  display:block;width:18px;height:1.5px;
+  background:var(--text);border-radius:2px;
+  transition:all .35s cubic-bezier(.19,1,.22,1);
+  transform-origin:center;
+}
+.nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* Mobile nav drawer */
+.mobile-nav-drawer{
+  position:fixed;top:68px;left:0;right:0;z-index:89;
+  background:var(--navbar-bg);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  padding:16px 20px 24px;
+  display:flex;flex-direction:column;gap:4px;
+  transform:translateY(-8px);
+  opacity:0;pointer-events:none;
+  transition:all .35s cubic-bezier(.19,1,.22,1);
+}
+.mobile-nav-drawer.open{transform:translateY(0);opacity:1;pointer-events:all}
+.mobile-nav-link{
+  display:flex;align-items:center;
+  padding:13px 16px;
+  border-radius:10px;
+  font-size:15px;font-weight:500;
+  color:var(--text-2);
+  transition:all .2s;
+  border:1px solid transparent;
+}
+.mobile-nav-link:hover,.mobile-nav-link:active{
+  background:var(--accent-dim);
+  border-color:var(--border);
+  color:var(--text);
+}
+.mobile-nav-divider{height:1px;background:var(--border-2);margin:8px 0}
+.mobile-nav-actions{display:flex;gap:10px;margin-top:8px}
+.mobile-nav-actions .btn-cta{flex:1;text-align:center;padding:12px}
+
+/* ── TABLET 960px ── */
+@media(max-width:960px){
+  .container{padding:0 24px}
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .nav-hamburger{display:flex}
+  /* hide theme label on tablet */
+  .theme-depth-indicator{display:none}
+
+  .hero-content{grid-template-columns:1fr;gap:0;padding:60px 24px 48px}
+  .hero-visual{display:none}
+  .hero-h1{font-size:clamp(44px,8vw,72px)}
+  .hero-stats{gap:28px;margin-top:36px;padding-top:28px}
+  .stat-num{font-size:32px}
+
+  .cat-section{padding:80px 0}
+  .cat-grid{grid-template-columns:1fr 1fr;gap:14px}
+
+  .prod-section{padding:0 0 80px}
+  .prod-grid{grid-template-columns:1fr 1fr;gap:16px}
+
+  .why-section{padding:80px 0}
+  .why-grid{grid-template-columns:1fr;gap:40px}
+  .why-cards{
+    display:grid!important;
+    grid-template-columns:repeat(3,1fr);
+    height:auto;gap:14px;
+    position:static;
+  }
+  .why-wcard{position:static!important;top:auto!important;left:auto!important;right:auto!important}
+
+  .contact-section{padding:80px 0}
+  .contact-grid{grid-template-columns:1fr;gap:40px}
+
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .admin-grid{grid-template-columns:1fr 1fr}
+
+  /* modal */
+  .modal-overlay{padding:16px}
+  .modal-box{max-height:92vh}
+}
+
+/* ── MOBILE 600px ── */
 @media(max-width:600px){
-  .cat-grid,.prod-grid{grid-template-columns:1fr}
-  .form-row,.admin-grid{grid-template-columns:1fr}
-  .footer-grid{grid-template-columns:1fr}
-  .hero-stats{flex-wrap:wrap;gap:20px}
+  .container{padding:0 16px}
+  nav{padding:0 16px;height:60px}
+  .mobile-nav-drawer{top:60px}
+
+  /* hero */
+  .hero-content{padding:48px 16px 40px}
+  .hero-h1{font-size:clamp(38px,11vw,56px);line-height:.95}
+  .hero-desc{font-size:14px;margin-bottom:28px}
+  .hero-actions{flex-direction:column;gap:10px}
+  .hero-actions .btn-primary,.hero-actions .btn-outline{width:100%;justify-content:center;padding:14px 20px}
+  .hero-stats{flex-wrap:wrap;gap:18px;margin-top:28px;padding-top:22px}
+  .stat-num{font-size:28px}
+  .stat-label{font-size:11px}
+
+  /* section headers */
+  .section-hdr{margin-bottom:40px}
+  .section-title{font-size:clamp(32px,9vw,48px)}
+
+  /* categories */
+  .cat-section{padding:60px 0}
+  .cat-grid{grid-template-columns:1fr;gap:12px}
+  .cat-card{padding:24px 20px}
+
+  /* products */
+  .prod-section{padding:0 0 60px}
+  .prod-grid{grid-template-columns:1fr;gap:14px}
+  .prod-filter{gap:6px;margin-bottom:36px}
+  .fpill{font-size:11px;padding:7px 14px}
+
+  /* why */
+  .why-section{padding:60px 0}
+  .why-features{gap:24px;margin-top:32px}
+  .why-cards{grid-template-columns:1fr!important;gap:12px}
+  .why-num{font-size:36px;width:44px}
+
+  /* contact */
+  .contact-section{padding:60px 0}
+  .contact-info-items{gap:18px;margin-top:28px}
+  .ci-icon{width:36px;height:36px}
+  .quote-form{padding:24px 20px}
+  .form-row{grid-template-columns:1fr}
+  .wa-btn{width:100%;justify-content:center;margin-top:24px}
+
+  /* footer */
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  footer{padding:40px 0 20px}
+  .footer-bottom{flex-direction:column;gap:14px;text-align:center}
+  .footer-badges{justify-content:center}
+
+  /* modal */
+  .modal-overlay{padding:0;align-items:flex-end}
+  .modal-box{
+    border-radius:20px 20px 0 0;
+    max-height:92vh;
+    width:100%;
+  }
+  .modal-hdr{padding:20px 20px 16px}
+  .modal-body{padding:20px}
   .modal-meta{grid-template-columns:1fr 1fr}
+  .modal-actions{flex-direction:column}
+  .modal-actions .btn-primary,.modal-actions .btn-outline{width:100%;justify-content:center}
+
+  /* misc */
+  .form-row,.admin-grid{grid-template-columns:1fr}
   .img-preview-grid{grid-template-columns:repeat(3,1fr)}
+
+  /* nav right — hide depth on mobile */
+  .theme-depth-indicator{display:none}
+  .lang-toggle{padding:2px;gap:1px}
+  .lang-btn{font-size:10px;padding:4px 9px}
+  .btn-cta{font-size:12px;padding:8px 16px}
+
+  /* ISO banner */
+  .iso-banner-inner{flex-direction:column!important;gap:20px!important}
+  .iso-banner-inner > a{width:100%!important;justify-content:center!important}
+}
+
+/* ── TINY 380px ── */
+@media(max-width:380px){
+  .hero-h1{font-size:34px}
+  .section-title{font-size:30px}
+  .container{padding:0 12px}
+  nav{padding:0 12px}
 }
 </style>
 </head>
@@ -471,8 +634,24 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
     <button class="btn-cta" onclick="dmScrollTo('contact')" data-tr="Teklif Al" data-en="Get Quote">Teklif Al</button>
+    <!-- Hamburger -->
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- ══ MOBILE NAV DRAWER ══ -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <a class="mobile-nav-link" href="#categories" onclick="closeMobileNav()" data-tr="Kategoriler" data-en="Categories">Kategoriler</a>
+  <a class="mobile-nav-link" href="#products" onclick="closeMobileNav()" data-tr="Ürünler" data-en="Products">Ürünler</a>
+  <a class="mobile-nav-link" href="#why" onclick="closeMobileNav()" data-tr="Neden Biz?" data-en="Why Us?">Neden Biz?</a>
+  <a class="mobile-nav-link" href="#contact" onclick="closeMobileNav()" data-tr="İletişim" data-en="Contact">İletişim</a>
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-actions">
+    <button class="btn-cta" style="flex:1" onclick="dmScrollTo('contact');closeMobileNav()" data-tr="Teklif Al" data-en="Get Quote">Teklif Al</button>
+  </div>
+</div>
 
 <!-- ══ HERO ══ -->
 <section class="hero" id="home">
@@ -652,14 +831,14 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
 <!-- ══ ISO CERTIFICATE BANNER ══ -->
 <section style="padding:60px 0;background:var(--bg-1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:32px">
-      <div style="display:flex;align-items:center;gap:24px">
-        <div style="width:64px;height:64px;background:var(--accent-dim);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+    <div class="iso-banner-inner" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px">
+      <div style="display:flex;align-items:center;gap:20px;flex:1;min-width:0">
+        <div style="width:60px;height:60px;background:var(--accent-dim);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
         </div>
-        <div>
+        <div style="min-width:0">
           <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);margin-bottom:4px">IQR INTERNATIONAL · 2025/QMS/1503</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;color:var(--text)">ISO 9001:2015 <span style="color:var(--accent)" data-tr="KALİTE YÖNETİM SİSTEMİ" data-en="QUALITY MANAGEMENT SYSTEM">KALİTE YÖNETİM SİSTEMİ</span></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,26px);letter-spacing:.04em;color:var(--text);white-space:nowrap">ISO 9001:2015 <span style="color:var(--accent)" data-tr="KALİTE YÖNETİM SİSTEMİ" data-en="QUALITY MANAGEMENT SYSTEM">KALİTE YÖNETİM SİSTEMİ</span></div>
           <div style="font-size:13px;color:var(--text-2);margin-top:4px" data-tr="Gemi teknik servisi, köprü-üstü cihaz bakımları ve otomasyon sistem servisleri kapsamında belgelendirilmiştir." data-en="Certified for ship technical service, bridge-top device maintenance and automation system services.">Gemi teknik servisi, köprü-üstü cihaz bakımları ve otomasyon sistem servisleri kapsamında belgelendirilmiştir.</div>
         </div>
       </div>
@@ -681,11 +860,11 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
       </div>
       <div><div class="fc-title" data-tr="Kategoriler" data-en="Categories">Kategoriler</div><div class="fc-links"><a href="#products" onclick="filterProds('Elektrik')"><span data-tr="Elektrik" data-en="Electrical">Elektrik</span></a><a href="#products" onclick="filterProds('Otomasyon')"><span data-tr="Otomasyon" data-en="Automation">Otomasyon</span></a><a href="#products" onclick="filterProds('Solar')">Solar</a><a href="#products" onclick="filterProds('Balast')"><span data-tr="Balast" data-en="Ballast">Balast</span></a><a href="#products" onclick="filterProds('Isıtma')"><span data-tr="Isıtma" data-en="Heating">Isıtma</span></a></div></div>
       <div><div class="fc-title" data-tr="Şirket" data-en="Company">Şirket</div><div class="fc-links"><a href="#why" data-tr="Hakkımızda" data-en="About">Hakkımızda</a><a href="#contact" data-tr="İletişim" data-en="Contact">İletişim</a><a href="#contact" data-tr="Teklif Al" data-en="Get Quote">Teklif Al</a></div></div>
-      <div><div class="fc-title" data-tr="Sertifikalar" data-en="Certifications">Sertifikalar</div><div class="fc-links"><a><span data-tr="IMO Sertifikalı" data-en="IMO Certified">IMO Sertifikalı</span></a><a><span data-tr="SOLAS Uyumlu" data-en="SOLAS Compliant">SOLAS Uyumlu</span></a><a href="DEEP_MARINE_ISO_9001_CERTIFICATE.pdf" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--accent);font-weight:600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>ISO 9001:2015 <span data-tr="Sertifikası" data-en="Certificate">Sertifikası</span> ↗</a></div></div>
+      <div><div class="fc-title" data-tr="Sertifikalar" data-en="Certifications">Sertifikalar</div><div class="fc-links"><a href="DEEP_MARINE_ISO_9001_CERTIFICATE.pdf" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--accent);font-weight:600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>ISO 9001:2015 ↗</a></div></div>
     </div>
     <div class="footer-bottom">
       <div class="footer-copy">© 2026 Deep Marine Services. <span data-tr="Tüm hakları saklıdır." data-en="All rights reserved.">Tüm hakları saklıdır.</span></div>
-      <div class="footer-badges"><div class="fbadge">IMO</div><div class="fbadge">SOLAS</div><div class="fbadge">ISO 9001</div></div>
+      <div class="footer-badges"><div class="fbadge">ISO 9001:2015</div></div>
     </div>
   </div>
 </footer>
@@ -1058,6 +1237,8 @@ function setLang(lang) {
   document.title = lang === 'tr'
     ? 'Deep Marine Services — Denizcilik Ekipman & Yedek Parça'
     : 'Deep Marine Services — Marine Equipment & Spare Parts';
+
+  // mobile drawer links (same data-tr/data-en handled above via querySelectorAll)
 
   // depth label stays as-is (theme-based)
   renderProds();
@@ -1547,6 +1728,37 @@ async function deleteProduct(id) {
 // ════════════════════════════════════
 window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  // close mobile nav on scroll
+  closeMobileNav();
+});
+
+// ════════════════════════════════════
+// HAMBURGER MENU
+// ════════════════════════════════════
+function toggleMobileNav() {
+  const btn = document.getElementById('navHamburger');
+  const drawer = document.getElementById('mobileNavDrawer');
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) { closeMobileNav(); } else {
+    btn.classList.add('open');
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeMobileNav() {
+  const btn = document.getElementById('navHamburger');
+  const drawer = document.getElementById('mobileNavDrawer');
+  btn.classList.remove('open');
+  drawer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+// close on outside tap
+document.addEventListener('click', e => {
+  const drawer = document.getElementById('mobileNavDrawer');
+  const btn = document.getElementById('navHamburger');
+  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !btn.contains(e.target)) {
+    closeMobileNav();
+  }
 });
 
 function observeFade() {
