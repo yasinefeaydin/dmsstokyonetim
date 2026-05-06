@@ -1548,7 +1548,6 @@ async function saveProduct(publish=false) {
     description: document.getElementById('af-desc').value.trim(),
   };
 
-  // visible flag — true if published to site
   if (publish) productData.visible = true;
 
   let productId = editingId;
@@ -1556,7 +1555,43 @@ async function saveProduct(publish=false) {
   if (editingId) {
     const { error } = await sb.from('products').update(productData).eq('id', editingId);
     if (error) { toast('⚠ Güncelleme hatası: '+error.message,'error'); saveBtn.disabled=pubBtn.disabled=false; resetBtns(); return; }
+
+    // ── Görsel sync: önce tüm mevcut kayıtları sil, sonra yeniden yaz ──
+    const existingProduct = products.find(x=>x.id===editingId);
+    const keptUrls = pendingImgs.filter(i=>!i.isNew).map(i=>i.url);
+
+    // Supabase'den silinecek kayıtları bul (artık pendingImgs'da olmayan eski URL'ler)
+    if (existingProduct && existingProduct.imageRecords) {
+      const toDelete = existingProduct.imageRecords.filter(r => !keptUrls.includes(r.url));
+      for (const rec of toDelete) {
+        await sb.from('product_images').delete().eq('id', rec.id);
+        // Storage'dan da sil (path'i URL'den çıkar)
+        try {
+          const urlObj = new URL(rec.url);
+          const pathParts = urlObj.pathname.split('/product-images/');
+          if (pathParts[1]) await sb.storage.from('product-images').remove([decodeURIComponent(pathParts[1])]);
+        } catch {}
+      }
+    }
+
+    // Yeni görselleri yükle
+    const newImgs = pendingImgs.filter(i=>i.isNew&&i.file);
+    for (let i=0;i<newImgs.length;i++) {
+      const url = await uploadImage(newImgs[i].file, productId, i);
+      if (url) await sb.from('product_images').insert({product_id:productId, url, order_index: pendingImgs.indexOf(newImgs[i])});
+    }
+
+    // order_index güncelle (kalan eski görseller için)
+    for (let i=0;i<pendingImgs.length;i++) {
+      const img = pendingImgs[i];
+      if (!img.isNew && existingProduct?.imageRecords) {
+        const rec = existingProduct.imageRecords.find(r=>r.url===img.url);
+        if (rec) await sb.from('product_images').update({order_index:i}).eq('id',rec.id);
+      }
+    }
+
   } else {
+    // Yeni ürün
     if (!productData.code) {
       const catPfx = cat.substring(0,2).toUpperCase();
       const count = products.length + 1;
@@ -1565,13 +1600,13 @@ async function saveProduct(publish=false) {
     const { data, error } = await sb.from('products').insert(productData).select().single();
     if (error) { toast('⚠ Ekleme hatası: '+error.message,'error'); saveBtn.disabled=pubBtn.disabled=false; resetBtns(); return; }
     productId = data.id;
-  }
 
-  // Upload new images
-  const newImgs = pendingImgs.filter(i=>i.isNew&&i.file);
-  for (let i=0;i<newImgs.length;i++) {
-    const url = await uploadImage(newImgs[i].file, productId, i);
-    if (url) await sb.from('product_images').insert({product_id:productId, url, order_index: pendingImgs.indexOf(newImgs[i])});
+    // Görselleri yükle
+    const newImgs = pendingImgs.filter(i=>i.isNew&&i.file);
+    for (let i=0;i<newImgs.length;i++) {
+      const url = await uploadImage(newImgs[i].file, productId, i);
+      if (url) await sb.from('product_images').insert({product_id:productId, url, order_index:i});
+    }
   }
 
   toast(publish ? '✓ Ürün kaydedildi ve siteye yayınlandı!' : '✓ Ürün kaydedildi', publish?'success':'');
