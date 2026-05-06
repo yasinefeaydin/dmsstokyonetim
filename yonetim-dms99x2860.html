@@ -1209,7 +1209,7 @@ async function loadProducts() {
     priceUsd: p.price_usd,
     unit: p.unit,
     desc: p.description || '',
-    visible: p.visible !== false, // default true if column doesn't exist
+    visible: p.visible === true, // sadece kesin true olanlar yayınlı sayılır
     images: (p.product_images || []).sort((a,b)=>a.order_index-b.order_index).map(i=>i.url),
     imageRecords: p.product_images || [],
   }));
@@ -1569,10 +1569,14 @@ async function saveProduct(publish=false) {
     description: document.getElementById('af-desc').value.trim(),
   };
 
-  // FIX 1: visible sadece yayınla butonuna basınca true olsun
-  // Kaydet butonunda visible alanına hiç dokunma (mevcut değeri koru)
-  if (publish) productData.visible = true;
-  // NOT: sadece kaydet'e basınca visible'a hiç değer atamıyoruz
+  // visible: sadece "Yayınla" butonunda true, her zaman açık set et
+  productData.visible = publish ? true : false;
+
+  // Düzenleme modunda: mevcut visible değerini koru, sadece publish ile override et
+  if (editingId && !publish) {
+    const existing = products.find(x=>x.id===editingId);
+    productData.visible = existing ? existing.visible : false;
+  }
 
   let productId = editingId;
 
@@ -1623,8 +1627,7 @@ async function saveProduct(publish=false) {
     }
 
   } else {
-    // Yeni ürün — visible varsayılan false (yayınlanmamış)
-    if (!publish) productData.visible = false;
+    // Yeni ürün — visible zaten yukarıda false olarak set edildi
     if (!productData.code) {
       const catPfx = cat.substring(0,2).toUpperCase();
       const count = products.length + 1;
