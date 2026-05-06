@@ -1170,6 +1170,21 @@ async function init() {
   renderProductsPage();
   renderAlertsPage();
   buildCatNav();
+
+  // FIX 2: Hash'ten sayfayı geri yükle
+  const hash = window.location.hash.replace('#','');
+  if (hash.startsWith('cat-')) {
+    const cat = decodeURIComponent(hash.replace('cat-',''));
+    if (products.some(p=>p.cat===cat)) { showCategory(cat); return; }
+  }
+  const validPages = ['dashboard','products','alerts'];
+  if (hash && validPages.includes(hash)) {
+    // İlgili nav item'ı bul
+    const navEl = document.querySelector(`.nav-item[onclick*="'${hash}'"]`);
+    showPage(hash, navEl);
+  } else {
+    showPage('dashboard', document.querySelector('.nav-item'));
+  }
 }
 
 // ════════════════════════════════
@@ -1255,6 +1270,8 @@ function showPage(name, navEl) {
   if (navEl) navEl.classList.add('active');
   const titles = {dashboard:'Dashboard',products:'Ürünler',alerts:'Uyarılar',category: activeCatPage || 'Kategori'};
   document.getElementById('topbarTitle').textContent = titles[name] || name;
+  // Hash'i güncelle — F5'te aynı sayfada kalmak için
+  history.replaceState(null, '', '#' + name);
 
   if (name === 'products') renderProductsPage();
   if (name === 'alerts') renderAlertsPage();
@@ -1272,6 +1289,8 @@ function showCategory(cat) {
   document.getElementById('catPageTitle').textContent = cat.toUpperCase();
   const catProds = products.filter(p=>p.cat===cat);
   document.getElementById('catPageSub').textContent = catProds.length + ' ürün';
+  // Hash'i güncelle
+  history.replaceState(null, '', '#cat-' + encodeURIComponent(cat));
 
   const tbody = document.getElementById('catTableBody');
   tbody.innerHTML = catProds.map(p => prodRow(p, true)).join('');
@@ -1548,7 +1567,10 @@ async function saveProduct(publish=false) {
     description: document.getElementById('af-desc').value.trim(),
   };
 
+  // FIX 1: visible sadece yayınla butonuna basınca true olsun
+  // Kaydet butonunda visible alanına hiç dokunma (mevcut değeri koru)
   if (publish) productData.visible = true;
+  // NOT: sadece kaydet'e basınca visible'a hiç değer atamıyoruz
 
   let productId = editingId;
 
@@ -1556,21 +1578,29 @@ async function saveProduct(publish=false) {
     const { error } = await sb.from('products').update(productData).eq('id', editingId);
     if (error) { toast('⚠ Güncelleme hatası: '+error.message,'error'); saveBtn.disabled=pubBtn.disabled=false; resetBtns(); return; }
 
-    // ── Görsel sync: önce tüm mevcut kayıtları sil, sonra yeniden yaz ──
+    // FIX 3: Görsel sync — mevcut product_images kayıtlarını çek, silinenleri sil
     const existingProduct = products.find(x=>x.id===editingId);
     const keptUrls = pendingImgs.filter(i=>!i.isNew).map(i=>i.url);
 
-    // Supabase'den silinecek kayıtları bul (artık pendingImgs'da olmayan eski URL'ler)
-    if (existingProduct && existingProduct.imageRecords) {
+    if (existingProduct?.imageRecords?.length) {
       const toDelete = existingProduct.imageRecords.filter(r => !keptUrls.includes(r.url));
-      for (const rec of toDelete) {
-        await sb.from('product_images').delete().eq('id', rec.id);
-        // Storage'dan da sil (path'i URL'den çıkar)
-        try {
-          const urlObj = new URL(rec.url);
-          const pathParts = urlObj.pathname.split('/product-images/');
-          if (pathParts[1]) await sb.storage.from('product-images').remove([decodeURIComponent(pathParts[1])]);
-        } catch {}
+      if (toDelete.length > 0) {
+        // product_images tablosundan sil
+        const deleteIds = toDelete.map(r=>r.id);
+        await sb.from('product_images').delete().in('id', deleteIds);
+        // Supabase Storage'dan da sil
+        for (const rec of toDelete) {
+          try {
+            const urlObj = new URL(rec.url);
+            // URL formatı: .../storage/v1/object/public/product-images/PATH
+            const marker = '/product-images/';
+            const idx = urlObj.pathname.indexOf(marker);
+            if (idx !== -1) {
+              const storagePath = decodeURIComponent(urlObj.pathname.substring(idx + marker.length));
+              await sb.storage.from('product-images').remove([storagePath]);
+            }
+          } catch(e) { console.warn('Storage silme hatası:', e); }
+        }
       }
     }
 
@@ -1581,7 +1611,7 @@ async function saveProduct(publish=false) {
       if (url) await sb.from('product_images').insert({product_id:productId, url, order_index: pendingImgs.indexOf(newImgs[i])});
     }
 
-    // order_index güncelle (kalan eski görseller için)
+    // Kalan eski görsellerin order_index'ini güncelle
     for (let i=0;i<pendingImgs.length;i++) {
       const img = pendingImgs[i];
       if (!img.isNew && existingProduct?.imageRecords) {
@@ -1591,7 +1621,8 @@ async function saveProduct(publish=false) {
     }
 
   } else {
-    // Yeni ürün
+    // Yeni ürün — visible varsayılan false (yayınlanmamış)
+    if (!publish) productData.visible = false;
     if (!productData.code) {
       const catPfx = cat.substring(0,2).toUpperCase();
       const count = products.length + 1;
@@ -1601,7 +1632,6 @@ async function saveProduct(publish=false) {
     if (error) { toast('⚠ Ekleme hatası: '+error.message,'error'); saveBtn.disabled=pubBtn.disabled=false; resetBtns(); return; }
     productId = data.id;
 
-    // Görselleri yükle
     const newImgs = pendingImgs.filter(i=>i.isNew&&i.file);
     for (let i=0;i<newImgs.length;i++) {
       const url = await uploadImage(newImgs[i].file, productId, i);
@@ -1609,7 +1639,7 @@ async function saveProduct(publish=false) {
     }
   }
 
-  toast(publish ? '✓ Ürün kaydedildi ve siteye yayınlandı!' : '✓ Ürün kaydedildi', publish?'success':'');
+  toast(publish ? '✓ Ürün kaydedildi ve siteye yayınlandı!' : '✓ Stok yönetimine kaydedildi (henüz yayınlanmadı)', publish?'success':'');
   resetBtns();
   closeModal('prodModal');
   await loadProducts();
