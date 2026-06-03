@@ -1334,7 +1334,7 @@ async function uploadImage(file, productId, idx) {
 // ════════════════════════════════
 // HELPERS
 // ════════════════════════════════
-function getStatus(p) { return p.stock===0?'out':p.stock<p.min?'low':'ok'; }
+function getStatus(p) { if (!p.min || p.min <= 0) return 'ok'; return p.stock===0?'out':p.stock<p.min?'low':'ok'; }
 function statusLabel(p) { return {ok:'Stokta',low:'Azalıyor',out:'Stok Yok'}[getStatus(p)]; }
 function fmtUsd(v) { return '$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function cats() { return [...new Set(products.map(p=>p.cat))].sort(); }
@@ -1889,7 +1889,7 @@ async function saveProduct(publish=false) {
     unit: document.getElementById('af-unit').value,
     price_usd: parseFloat(document.getElementById('af-price').value)||0,
     stock: parseInt(document.getElementById('af-stock').value)||0,
-    min_stock: parseInt(document.getElementById('af-min').value)||5,
+    min_stock: (() => { const v = parseInt(document.getElementById('af-min').value, 10); return Number.isNaN(v) || v < 0 ? 0 : v; })(),
     loc: document.getElementById('af-loc').value.trim() || 'A-01',
     description: document.getElementById('af-desc').value.trim(),
   };
