@@ -969,10 +969,11 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
     <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border-2);padding-bottom:0">
       <button class="admin-tab-btn active" data-tab="products" onclick="switchAdminTab('products')" style="background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 18px;cursor:pointer;transition:all .2s">ÜRÜNLER</button>
       <button class="admin-tab-btn" data-tab="sales" onclick="switchAdminTab('sales')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-3);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 18px;cursor:pointer;transition:all .2s">SATIŞLAR</button>
+      <button class="admin-tab-btn" data-tab="categories" onclick="switchAdminTab('categories')" style="background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-3);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;padding:8px 18px;cursor:pointer;transition:all .2s">KATEGORİLER</button>
     </div>
 
     <!-- TAB: Ürünler -->
-    <div id="tab-products">
+    <div id="tab-products" class="admin-tab-pane">
       <div class="admin-grid" id="adminStats"></div>
       <div style="margin-top:8px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -987,7 +988,7 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
     </div>
 
     <!-- TAB: Satışlar -->
-    <div id="tab-sales" style="display:none">
+    <div id="tab-sales" class="admin-tab-pane" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div class="admin-section-title">SATIŞ KAYITLARI</div>
         <button class="btn-admin btn-green" onclick="openSaleForm()">+ Yeni Satış</button>
@@ -995,6 +996,29 @@ footer{background:var(--bg-3);border-top:1px solid var(--border);padding:56px 0 
       <table class="admin-prod-table">
         <thead><tr><th>Tarih</th><th>Müşteri</th><th>Ürünler</th><th>Toplam</th><th>Ödeme</th><th>İşlem</th></tr></thead>
         <tbody id="salesTableBody"><tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:40px;font-family:'DM Mono',monospace;font-size:12px">Yükleniyor...</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- TAB: Kategoriler -->
+    <div id="tab-categories" class="admin-tab-pane" style="display:none">
+      <div style="margin-bottom:20px">
+        <div class="admin-section-title" style="margin-bottom:14px">YENİ KATEGORİ EKLE</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-group" style="margin:0;flex:1;min-width:180px">
+            <label class="form-label">KATEGORİ ADI (TR) *</label>
+            <input type="text" class="form-input" id="newCatName" placeholder="Örn: Pompa" onkeydown="if(event.key==='Enter')addCategory()">
+          </div>
+          <div class="form-group" style="margin:0;flex:1;min-width:180px">
+            <label class="form-label">İNGİLİZCE ADI (opsiyonel)</label>
+            <input type="text" class="form-input" id="newCatNameEn" placeholder="e.g. Pump" onkeydown="if(event.key==='Enter')addCategory()">
+          </div>
+          <button class="btn-admin btn-green" style="padding:13px 20px" onclick="addCategory()">+ Kategori Ekle</button>
+        </div>
+      </div>
+      <div class="admin-section-title" style="margin-bottom:14px">MEVCUT KATEGORİLER</div>
+      <table class="admin-prod-table">
+        <thead><tr><th>Kategori (TR)</th><th>İngilizce</th><th>Ürün Sayısı</th><th>İşlem</th></tr></thead>
+        <tbody id="catTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:40px;font-family:'DM Mono',monospace;font-size:12px">Yükleniyor...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -1137,6 +1161,7 @@ let products = [
 
 let currentFilter = 'all';
 let currentLang = 'tr';
+let categories = [];
 let activeProdId = null;
 let pendingImageFiles = [];
 let pendingImages = [];
@@ -1539,6 +1564,7 @@ function openAdmin() {
   renderAdminStats();
   renderAdminTable(products);
   loadSales();
+  loadCategories().then(renderCategoriesTab);
 }
 function closeAdmin() {
   document.getElementById('adminPanel').style.display='none';
@@ -1587,6 +1613,78 @@ function renderAdminTable(data) {
 function adminSearch(q) {
   const filtered = q ? products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.code.toLowerCase().includes(q.toLowerCase())) : products;
   renderAdminTable(filtered);
+}
+
+// ════════════════════════════════════
+// KATEGORİLER
+// ════════════════════════════════════
+async function loadCategories() {
+  const { data, error } = await sb.from('categories').select('*').order('name');
+  if (error) { console.error('Kategori yükleme hatası:', error); return; }
+  categories = data || [];
+  populateCatDatalist();
+}
+
+async function addCategory() {
+  const nameEl = document.getElementById('newCatName');
+  const nameEnEl = document.getElementById('newCatNameEn');
+  const name = (nameEl?.value || '').trim();
+  const nameEn = (nameEnEl?.value || '').trim();
+  if (!name) { showToast('⚠ Kategori adı zorunludur'); return; }
+  if (categories.some(c => (c.name || '').toLowerCase() === name.toLowerCase())) {
+    showToast('⚠ Bu kategori zaten var'); return;
+  }
+  const { error } = await sb.from('categories').insert({ name, name_en: nameEn || null });
+  if (error) { showToast('⚠ Kategori eklenemedi: ' + error.message); return; }
+  if (nameEl) nameEl.value = '';
+  if (nameEnEl) nameEnEl.value = '';
+  await loadCategories();
+  renderCategoriesTab();
+  showToast('✓ Kategori eklendi');
+}
+
+async function deleteCategory(id) {
+  const c = categories.find(x => x.id === id);
+  if (!c) return;
+  const inUse = products.filter(p => p.cat === c.name).length;
+  const msg = inUse > 0
+    ? `"${c.name}" kategorisinde ${inUse} ürün var. Kategori silinince bu ürünler silinmez, sadece kategori listesinden kalkar. Devam edilsin mi?`
+    : `"${c.name}" kategorisi silinecek. Emin misiniz?`;
+  if (!confirm(msg)) return;
+  const { error } = await sb.from('categories').delete().eq('id', id);
+  if (error) { showToast('⚠ Silme hatası: ' + error.message); return; }
+  await loadCategories();
+  renderCategoriesTab();
+  showToast('✓ Kategori silindi');
+}
+
+function renderCategoriesTab() {
+  const tbody = document.getElementById('catTableBody');
+  if (!tbody) return;
+  if (!categories.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:40px;font-family:\'DM Mono\',monospace;font-size:12px">Henüz kategori yok. Yukarıdan ekleyebilirsin.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = categories.map(c => {
+    const count = products.filter(p => p.cat === c.name).length;
+    return `<tr>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">${c.name}</span></td>
+      <td style="font-size:13px;color:var(--text-2)">${c.name_en || '—'}</td>
+      <td style="font-weight:600">${count}</td>
+      <td><button class="btn-admin btn-del" onclick="deleteCategory(${c.id})">Sil</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Ürün formundaki kategori öneri listesini DB'deki kategorilerle doldur
+function populateCatDatalist() {
+  const dl = document.getElementById('af-cat-list');
+  if (!dl) return;
+  const defaults = ['Elektrik','Otomasyon','Isıtma','Solar','Balast','Sarf'];
+  const fromDb = categories.map(c => c.name);
+  const fromProducts = products.map(p => p.cat);
+  const all = [...new Set([...fromDb, ...defaults, ...fromProducts])].filter(Boolean);
+  dl.innerHTML = all.map(n => `<option>${n}</option>`).join('');
 }
 
 // ════════════════════════════════════
@@ -1923,12 +2021,14 @@ function switchAdminTab(tab) {
   // Yeni Ürün butonu sadece ürünler sekmesinde görünsün
   const addBtn = document.getElementById('adminAddBtn');
   if (addBtn) addBtn.style.display = tab === 'products' ? '' : 'none';
+  if (tab === 'categories') renderCategoriesTab();
 }
 
 // ════════════════════════════════════
 // INIT
 // ════════════════════════════════════
 loadProducts();
+loadCategories();
 </script>
 </body>
 </html>
