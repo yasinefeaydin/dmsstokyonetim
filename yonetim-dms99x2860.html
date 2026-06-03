@@ -978,7 +978,7 @@ a{color:inherit;text-decoration:none}
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Kategori <span>*</span></label>
-          <select class="form-select" id="af-cat">
+          <select class="form-select" id="af-cat" onchange="onCatSelectChange(this)">
             <option value="">— Seçiniz —</option>
             <option value="Elektrik">Elektrik</option>
             <option value="Otomasyon">Otomasyon</option>
@@ -1146,15 +1146,6 @@ a{color:inherit;text-decoration:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ⚠ GEÇİCİ HATA YAKALAYICI — sorun bulununca kaldırılacak
-window.addEventListener('error', function(ev){
-  alert('JS HATASI:\n' + (ev.message || '') + '\n\nSatır: ' + (ev.lineno || '?') + ':' + (ev.colno || '?'));
-});
-window.addEventListener('unhandledrejection', function(ev){
-  var r = ev.reason;
-  var msg = (r && (r.message || r.hint || r.details)) ? (r.message || r.hint || r.details) : (typeof r === 'string' ? r : JSON.stringify(r));
-  alert('PROMISE HATASI:\n' + msg);
-});
 // ════════════════════════════════
 // CONFIG — Ana siteyle aynı DB
 // ════════════════════════════════
@@ -1709,7 +1700,29 @@ function populateCatSelects() {
   const sel = document.getElementById('af-cat');
   if (!sel) return;
   const current = sel.value;
-  sel.innerHTML = '<option value="">— Seçiniz —</option>' + catList.map(c=>`<option value="${c}" ${current===c?'selected':''}>${c}</option>`).join('');
+  sel.innerHTML = '<option value="">— Seçiniz —</option>'
+    + catList.map(c=>`<option value="${c}" ${current===c?'selected':''}>${c}</option>`).join('')
+    + '<option value="__new__">➕ Yeni kategori ekle…</option>';
+  if (current && current !== '__new__') sel.dataset.prev = current;
+}
+
+// Ürün formunda "➕ Yeni kategori ekle…" seçilince oracıkta kategori oluştur
+async function onCatSelectChange(sel) {
+  if (sel.value !== '__new__') { sel.dataset.prev = sel.value; return; }
+  const name = (prompt('Yeni kategori adı:') || '').trim();
+  if (!name) { sel.value = sel.dataset.prev || ''; return; }
+  if (allCats().includes(name)) {
+    toast('⚠ Bu kategori zaten mevcut', 'error');
+    sel.value = name; sel.dataset.prev = name; return;
+  }
+  const { error } = await sb.from('categories').insert({ name });
+  if (error) { toast('⚠ Kategori eklenemedi: ' + error.message, 'error'); sel.value = sel.dataset.prev || ''; return; }
+  await loadCategories();
+  populateCatSelects();
+  sel.value = name; sel.dataset.prev = name;
+  buildCatNav();
+  if (typeof renderCategoriesPage === 'function') renderCategoriesPage();
+  toast(`✓ "${name}" kategorisi eklendi`, 'success');
 }
 
 function renderCategoriesPage() {
