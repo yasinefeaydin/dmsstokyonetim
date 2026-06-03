@@ -1146,6 +1146,15 @@ a{color:inherit;text-decoration:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ⚠ GEÇİCİ HATA YAKALAYICI — sorun bulununca kaldırılacak
+window.addEventListener('error', function(ev){
+  alert('JS HATASI:\n' + (ev.message || '') + '\n\nSatır: ' + (ev.lineno || '?') + ':' + (ev.colno || '?'));
+});
+window.addEventListener('unhandledrejection', function(ev){
+  var r = ev.reason;
+  var msg = (r && (r.message || r.hint || r.details)) ? (r.message || r.hint || r.details) : (typeof r === 'string' ? r : JSON.stringify(r));
+  alert('PROMISE HATASI:\n' + msg);
+});
 // ════════════════════════════════
 // CONFIG — Ana siteyle aynı DB
 // ════════════════════════════════
