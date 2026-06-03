@@ -1169,7 +1169,7 @@ let adjustAmt = 1;
 let adjustOp = 'add';
 let activeCatPage = null;
 let sidebarOpen = false;
-let customCategories = []; // localStorage'dan ek kategoriler
+let customCategories = []; // Supabase categories tablosundan yüklenir
 
 // ════════════════════════════════
 // AUTH — 30 dakika oturum hafızası
@@ -1271,8 +1271,8 @@ function logout() {
 // ════════════════════════════════
 async function init() {
   document.getElementById('dashDate').textContent = new Date().toLocaleDateString('tr-TR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  // Özel kategorileri localStorage'dan yükle
-  try { customCategories = JSON.parse(localStorage.getItem('dms_cats') || '[]'); } catch { customCategories = []; }
+  // Kategorileri Supabase'den yükle
+  await loadCategories();
   await loadProducts();
   await loadHistory();
   renderDashboard();
@@ -1674,6 +1674,22 @@ function renderHistoryPage() {
 // ════════════════════════════════
 // CATEGORIES MANAGEMENT
 // ════════════════════════════════
+async function loadCategories() {
+  const { data, error } = await sb.from('categories').select('name').order('name');
+  if (error) { console.error('Kategori yükleme hatası:', error); customCategories = []; return; }
+  customCategories = (data || []).map(c => c.name).filter(Boolean);
+  // Eski localStorage kategorilerini bir defaya mahsus Supabase'e taşı (veri kaybı olmasın)
+  try {
+    const legacy = JSON.parse(localStorage.getItem('dms_cats') || '[]');
+    const base = ['Elektrik','Otomasyon','Solar','Balast','Isıtma','Sarf'];
+    const toMigrate = legacy.filter(n => n && !base.includes(n) && !customCategories.includes(n));
+    if (toMigrate.length) {
+      const { error: mErr } = await sb.from('categories').insert(toMigrate.map(n => ({ name: n })));
+      if (!mErr) { customCategories.push(...toMigrate); localStorage.removeItem('dms_cats'); }
+    }
+  } catch {}
+}
+
 function allCats() {
   const base = ['Elektrik','Otomasyon','Solar','Balast','Isıtma','Sarf'];
   return [...new Set([...base, ...customCategories, ...products.map(p=>p.cat)])].filter(Boolean).sort();
@@ -1743,20 +1759,22 @@ async function saveCategory() {
 
   if (oldName && oldName !== name) {
     // Yeniden adlandır: tüm ürünleri güncelle
-    const { error } = await sb.from('products').update({cat: name}).eq('cat', oldName);
-    if (error) { toast('⚠ Güncelleme hatası: '+error.message, 'error'); return; }
-    // customCategories güncelle
-    customCategories = customCategories.map(c=>c===oldName?name:c);
+    const { error: pErr } = await sb.from('products').update({cat: name}).eq('cat', oldName);
+    if (pErr) { toast('⚠ Güncelleme hatası: '+pErr.message, 'error'); return; }
+    // categories tablosundaki kaydı da güncelle
+    const { error: cErr } = await sb.from('categories').update({name}).eq('name', oldName);
+    if (cErr) { toast('⚠ Kategori güncellenemedi: '+cErr.message, 'error'); return; }
     toast(`✓ "${oldName}" → "${name}" olarak güncellendi`, 'success');
   } else if (!oldName) {
     // Yeni kategori
     if (allCats().includes(name)) { toast('⚠ Bu kategori zaten mevcut', 'error'); return; }
-    customCategories.push(name);
+    const { error } = await sb.from('categories').insert({name});
+    if (error) { toast('⚠ Kategori eklenemedi: '+error.message, 'error'); return; }
     toast(`✓ "${name}" kategorisi eklendi`, 'success');
   }
 
-  localStorage.setItem('dms_cats', JSON.stringify(customCategories));
   closeModal('catModal');
+  await loadCategories();
   await loadProducts();
   populateCatSelects();
   buildCatNav();
@@ -1765,8 +1783,9 @@ async function saveCategory() {
 
 async function deleteCategory(name) {
   if (!confirm(`"${name}" kategorisini silmek istiyor musunuz?`)) return;
-  customCategories = customCategories.filter(c=>c!==name);
-  localStorage.setItem('dms_cats', JSON.stringify(customCategories));
+  const { error } = await sb.from('categories').delete().eq('name', name);
+  if (error) { toast('⚠ Silme hatası: '+error.message, 'error'); return; }
+  await loadCategories();
   populateCatSelects();
   buildCatNav();
   renderCategoriesPage();
